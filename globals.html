@@ -64,56 +64,75 @@
 <div class="container container-main">
 	<div class="row">
 		<div class="col-8 col-content">
-			<div class="tsd-panel tsd-typography">
-				<h1 id="phosphor-properties">phosphor-properties</h1>
-				<p>A module for attached property descriptors.</p>
-				<p><a href="http://phosphorjs.github.io/phosphor-properties/">API Docs</a></p>
-				<h2 id="package-install">Package Install</h2>
-				<p><strong>Prerequisites</strong></p>
-				<ul>
-					<li><a href="http://nodejs.org/">node</a></li>
-				</ul>
-				<pre><code class="lang-bash">npm install --save phosphor-properties
-</code></pre>
-				<h2 id="source-build">Source Build</h2>
-				<p><strong>Prerequisites</strong></p>
-				<ul>
-					<li><a href="http://git-scm.com/">git</a></li>
-					<li><a href="http://nodejs.org/">node</a></li>
-				</ul>
-				<pre><code class="lang-bash">git <span class="hljs-built_in">clone</span> https://github.com/phosphorjs/phosphor-properties.git
-<span class="hljs-built_in">cd</span> phosphor-properties
-npm install
-</code></pre>
-				<p><strong>Rebuild</strong></p>
-				<pre><code class="lang-bash">npm run clean
-npm run build
-</code></pre>
-				<h2 id="run-tests">Run Tests</h2>
-				<p>Follow the source build instructions first.</p>
-				<pre><code class="lang-bash">npm <span class="hljs-built_in">test</span>
-</code></pre>
-				<h2 id="build-docs">Build Docs</h2>
-				<p>Follow the source build instructions first.</p>
-				<pre><code class="lang-bash">npm run docs
-</code></pre>
-				<p>Navigate to <code>docs/index.html</code>.</p>
-				<h2 id="supported-runtimes">Supported Runtimes</h2>
-				<p>The runtime versions which are currently <em>known to work</em> are listed below.
-				Earlier versions may also work, but come with no guarantees.</p>
-				<ul>
-					<li>Node 0.12.7+</li>
-					<li>IE 11+</li>
-					<li>Firefox 32+</li>
-					<li>Chrome 38+</li>
-				</ul>
-				<h2 id="usage-examples">Usage Examples</h2>
-			</div>
+			<section class="tsd-panel-group tsd-index-group">
+				<h2>Index</h2>
+				<section class="tsd-panel tsd-index-panel">
+					<div class="tsd-index-content">
+						<section class="tsd-index-section ">
+							<h3>Classes</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-class tsd-has-type-parameter"><a href="classes/property.html" class="tsd-kind-icon">Property</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
+							<h3>Interfaces</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-interface"><a href="interfaces/ipropertychangedargs.html" class="tsd-kind-icon">IProperty<wbr>Changed<wbr>Args</a></li>
+								<li class="tsd-kind-interface tsd-has-type-parameter"><a href="interfaces/ipropertyoptions.html" class="tsd-kind-icon">IProperty<wbr>Options</a></li>
+								<li class="tsd-kind-interface"><a href="interfaces/ipropertyowner.html" class="tsd-kind-icon">IProperty<wbr>Owner</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
+							<h3>Functions</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-function"><a href="globals.html#clearpropertydata" class="tsd-kind-icon">clear<wbr>Property<wbr>Data</a></li>
+							</ul>
+						</section>
+					</div>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Functions</h2>
+				<section class="tsd-panel tsd-member tsd-kind-function">
+					<a name="clearpropertydata" class="tsd-anchor"></a>
+					<h3>clear<wbr>Property<wbr>Data</h3>
+					<ul class="tsd-signatures tsd-kind-function">
+						<li class="tsd-signature tsd-kind-icon">clear<wbr>Property<wbr>Data<span class="tsd-signature-symbol">(</span>owner<span class="tsd-signature-symbol">: </span><a href="interfaces/ipropertyowner.html" class="tsd-signature-type">IPropertyOwner</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/phosphorjs/phosphor-properties/blob/HEAD/src/index.ts#L294">index.ts:294</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Clear the stored property data for the given property owner.</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>owner: <a href="interfaces/ipropertyowner.html" class="tsd-signature-type">IPropertyOwner</a></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The property owner of interest.</p>
+										<h4 id="notes">Notes</h4>
+										<p>This will clear all property values for the owner, but it will
+										<strong>not</strong> emit any property change notifications.</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+			</section>
 		</div>
 		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
 			<nav class="tsd-navigation primary">
 				<ul>
-					<li class="globals  ">
+					<li class="globals current ">
 						<a href="globals.html"><em>Globals</em></a>
 					</li>
 				</ul>
