@@ -33,9 +33,8 @@ interface IPropertyChangedArgs {
 
 
 /**
- * An object which can be used with the property descriptors.
+ * An object which can be used with property descriptors.
  *
- * #### Notes
  * Any object can be used with property descriptors, provided that the
  * object has a [[propertyChanged]] signal. The signal will be emitted
  * automatically by the property descriptor when the value is changed.
