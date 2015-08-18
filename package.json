@@ -1,0 +1,43 @@
+{
+  "name": "phosphor-properties",
+  "version": "0.9.0",
+  "description": "A module for attached property descriptors.",
+  "main": "lib/index.js",
+  "typescript": {
+    "definition": "lib/phosphor-properties.d.ts"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "dts-generator": "^1.5.0",
+    "expect.js": "^0.3.1",
+    "mocha": "^2.2.5",
+    "rimraf": "^2.4.2",
+    "typedoc": "^0.3.8",
+    "typescript": "^1.5.3"
+  },
+  "scripts": {
+    "clean": "rimraf docs && rimraf lib && rimraf test/*.js",
+    "build:src": "tsc --project src",
+    "build:dts": "node scripts/dtsbundle.js",
+    "build:test": "tsc --project test",
+    "build": "npm run build:src && npm run build:dts && npm run build:test",
+    "docs": "rimraf docs && typedoc --options scripts/tdoptions.json",
+    "prepublish": "npm run build",
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/phosphorjs/phosphor-properties.git"
+  },
+  "keywords": [
+    "attached",
+    "property",
+    "properties"
+  ],
+  "author": "S. Chris Colbert <sccolbert@gmail.com>",
+  "license": "BSD-3-Clause",
+  "bugs": {
+    "url": "https://github.com/phosphorjs/phosphor-properties/issues"
+  },
+  "homepage": "https://github.com/phosphorjs/phosphor-properties"
+}
