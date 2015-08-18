@@ -6,7 +6,9 @@
   "typescript": {
     "definition": "lib/phosphor-properties.d.ts"
   },
-  "dependencies": {},
+  "dependencies": {
+    "phosphor-signaling": "^0.9.7"
+  },
   "devDependencies": {
     "dts-generator": "^1.5.0",
     "expect.js": "^0.3.1",
