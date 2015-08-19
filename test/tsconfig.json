@@ -9,6 +9,7 @@
   "files": [
     "../typings/expect.js/expect.js.d.ts",
     "../typings/mocha/mocha.d.ts",
-    "index.ts"
+    "../node_modules/phosphor-signaling/lib/phosphor-signaling.d.ts",
+    "testproperties.ts"
   ]
 }
