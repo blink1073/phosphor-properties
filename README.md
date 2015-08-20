@@ -73,3 +73,96 @@ Earlier versions may also work, but come with no guarantees.
 
 Usage Examples
 --------------
+
+**Note:** Except where explicitly noted in the examples, this module is fully
+compatible with Node/Babel/ES6/ES5. Simply omit the type declarations when
+using a language other than TypeScript.
+
+**Raw API:**
+
+
+```typescript
+import { IPropertyChangedArgs, IPropertyOwner, Property } from 'phosphor-properties';
+
+import { ISignal, defineSignal } from 'phosphor-signaling';
+
+
+// Any object can be used as a model, provided it implements `IPropertyOwner`.
+class Model implements IPropertyOwner {
+  /**
+   * A signal emitted automatically when a property is changed.
+   */
+  @defineSignal
+  propertyChanged: ISignal<IPropertyChangedArgs>;
+}
+
+var model1 = new Model();
+var model2 = new Model();
+
+
+// simple number property
+var valueProperty = new Property<Model, number>({
+  value: 42,
+});
+valueProperty.get(model1);      // 42
+valueProperty.set(model1, 84);  //
+valueProperty.get(model1);      // 84
+valueProperty.get(model2);      // 42
+
+
+// default value factory
+var listProperty = new Property<Model, number[]>({
+  create: model => [1, 2, 3],
+});
+var l1 = listProperty.get(model1);  // [1, 2, 3]
+var l2 = listProperty.get(model2);  // [1, 2, 3]
+l1 === l2;                          // false
+
+
+// coerce value callback
+var min = 0;
+var limitProperty = new Property<Model, number>({
+  value: 0,
+  coerce: (model, value) => Math.max(min, value),
+});
+limitProperty.set(model1, -10);  //
+limitProperty.get(model1);       // 0
+limitProperty.set(model1, 42);   //
+limitProperty.get(model1);       // 42
+min = 100;                       //
+limitProperty.coerce(model1);    // 100
+
+
+// value changed callback
+var loggingProperty = new Property<Model, number>({
+  value: 0,
+  changed: (model, oldValue, newValue) => {
+    console.log('changed:', oldValue, newValue);
+  },
+});
+loggingProperty.set(model1, 10);  // changed: 0 10
+loggingProperty.set(model1, 42);  // changed: 10 42
+
+
+// compare values callback (assume a `deepEqual` function exists)
+var objectProperty = new Property<Model, any>({
+  compare: (oldValue, newValue) => deepEqual(oldValue, newValue),
+  changed: (model, oldValue, newValue) => {
+    console.log('changed:', oldValue, newValue);
+  },
+});
+loggingProperty.set(model1, { a: 1, b: 2 });  // changed: undefined { a: 1, b: 2 }
+loggingProperty.set(model1, { a: 1, b: 2 });  //
+loggingProperty.set(model1, [1, 2, 3]);       // changed: { a: 1, b: 2 } [1, 2, 3]
+loggingProperty.set(model1, [1, 2, 3]);       //
+loggingProperty.set(model1, void 0);          // changed: [1, 2, 3] undefined
+
+
+// `propertyChanged` signal
+model1.propertyChanged.connect(args => {
+  if (args.property === valueProperty) {
+    console.log('value changed:', args.oldValue, args.newValue);
+  }
+});
+valueProperty.set(model1, 0);  // value changed: 84 0
+```
