@@ -56,6 +56,15 @@ describe('phosphor-properties', () => {
         var m1 = new Model();
         var m2 = new Model();
         var m3 = new Model();
+        expect(p1.get(m1)).to.be(void 0);
+        expect(p1.get(m2)).to.be(void 0);
+        expect(p1.get(m3)).to.be(void 0);
+        expect(p2.get(m1)).to.be(void 0);
+        expect(p2.get(m2)).to.be(void 0);
+        expect(p2.get(m3)).to.be(void 0);
+        expect(p3.get(m1)).to.be(void 0);
+        expect(p3.get(m2)).to.be(void 0);
+        expect(p3.get(m3)).to.be(void 0);
         p1.set(m1, 1);
         p1.set(m2, 2);
         p1.set(m3, 3);
