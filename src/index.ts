@@ -85,14 +85,14 @@ interface IPropertyOptions<T, U> {
   coerce?: (owner: T, value: U) => U;
 
   /**
-   * A function used to compare two values for inequality.
+   * A function used to compare two values for equality.
    *
    * This is called to determine if the property value has changed.
-   * It should return `true` if the given values are different, or
-   * `false` if they are equivalent.
+   * It should return `true` if the given values are equivalent, or
+   * `false` if they are different.
    *
    * #### Notes
-   * If this is not provided, the comparison uses the `!==` operator.
+   * If this is not provided, the comparison uses the `===` operator.
    */
   compare?: (oldValue: U, newValue: U) => boolean;
 
@@ -206,8 +206,8 @@ class Property<T extends IPropertyOwner, U> {
     } else {
       oldValue = this._createValue(owner);
     }
-    var newValue = hash[this._pid] = this._coerceValue(owner, value);
-    this._notifyIfChanged(owner, oldValue, newValue);
+    var newValue = this._coerceValue(owner, value);
+    this._maybeNotify(owner, oldValue, hash[this._pid] = newValue);
   }
 
   /**
@@ -230,8 +230,8 @@ class Property<T extends IPropertyOwner, U> {
     } else {
       oldValue = this._createValue(owner);
     }
-    var newValue = hash[this._pid] = this._coerceValue(owner, oldValue);
-    this._notifyIfChanged(owner, oldValue, newValue);
+    var newValue = this._coerceValue(owner, oldValue);
+    this._maybeNotify(owner, oldValue, hash[this._pid] = newValue);
   }
 
   /**
@@ -251,24 +251,22 @@ class Property<T extends IPropertyOwner, U> {
   }
 
   /**
-   * Compare the old value and new value for inequality.
+   * Compare the old value and new value for equality.
    */
   private _compareValues(oldValue: U, newValue: U): boolean {
     var compare = this._compare;
-    return compare ? compare(oldValue, newValue) : oldValue !== newValue;
+    return compare ? compare(oldValue, newValue) : oldValue === newValue;
   }
 
   /**
    * Run the change notification if the given values are different.
    */
-  private _notifyIfChanged(owner: T, oldValue: U, newValue: U): void {
+  private _maybeNotify(owner: T, oldValue: U, newValue: U): void {
     if (!this._compareValues(oldValue, newValue)) {
-      return;
+      var changed = this._changed;
+      if (changed) changed(owner, oldValue, newValue);
+      owner.propertyChanged.emit(changedArgs(this, oldValue, newValue));
     }
-    var changed = this._changed;
-    if (changed) changed(owner, oldValue, newValue);
-    var args = { property: this, oldValue: oldValue, newValue: newValue };
-    owner.propertyChanged.emit(args);
   }
 
   private _value: U;
@@ -311,6 +309,14 @@ var ownerData = new WeakMap<IPropertyOwner, PropertyHash>();
  * A function which computes successive unique property ids.
  */
 var nextPID = (() => { var id = 0; return () => 'pid-' + id++; })();
+
+
+/**
+ * Create the property changed args for the given property and values.
+ */
+function changedArgs(property: Property<any, any>, oldValue: any, newValue: any): IPropertyChangedArgs {
+  return { property: property, oldValue: oldValue, newValue: newValue };
+}
 
 
 /**

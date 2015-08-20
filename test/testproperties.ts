@@ -39,7 +39,7 @@ describe('phosphor-properties', () => {
           value: 12,
           create: (owner) => 42,
           coerce: (owner, value) => Math.max(0, value),
-          compare: (oldValue, newValue) => oldValue !== newValue,
+          compare: (oldValue, newValue) => oldValue === newValue,
           changed: (owner, oldValue, newValue) => { },
         });
         expect(p instanceof Property).to.be(true);
@@ -157,7 +157,7 @@ describe('phosphor-properties', () => {
 
       it('should not invoke the compare function', () => {
         var called = false;
-        var compare = (v1: number, v2: number) => (called = true,  v1 !== v2);
+        var compare = (v1: number, v2: number) => (called = true,  v1 === v2);
         var p1 = new Property<Model, number>({ value: 1, compare: compare });
         var p2 = new Property<Model, number>({ value: 1, compare: compare });
         var p3 = new Property<Model, number>({ value: 1, compare: compare });
@@ -404,7 +404,7 @@ describe('phosphor-properties', () => {
 
       it('should invoke the compare function to compare values', () => {
         var called = false;
-        var compare = (v1: number, v2: number) => (called = true,  v1 !== v2);
+        var compare = (v1: number, v2: number) => (called = true,  v1 === v2);
         var p = new Property<Model, number>({ value: 1, compare: compare });
         var m = new Model();
         p.set(m, 42);
@@ -414,7 +414,7 @@ describe('phosphor-properties', () => {
       it('should not invoke the changed function if the value does not change', () => {
         var called = false;
         var changed = () => { called = true; };
-        var compare = (v1: number, v2: number) => false;
+        var compare = (v1: number, v2: number) => true;
         var p1 = new Property<Model, number>({ value: 1, changed: changed });
         var p2 = new Property<Model, number>({ value: 1, compare: compare, changed: changed });
         var m = new Model();
@@ -430,7 +430,7 @@ describe('phosphor-properties', () => {
       it('should not emit the `propertyChanged` signal if the value does not change', () => {
         var called = false;
         var changed = () => { called = true; };
-        var compare = (v1: number, v2: number) => false;
+        var compare = (v1: number, v2: number) => true;
         var p1 = new Property<Model, number>({ value: 1 });
         var p2 = new Property<Model, number>({ value: 1, compare: compare });
         var m = new Model();
@@ -538,7 +538,7 @@ describe('phosphor-properties', () => {
 
       it('should invoke the compare function to compare values', () => {
         var called = false;
-        var compare = (v1: number, v2: number) => (called = true,  v1 !== v2);
+        var compare = (v1: number, v2: number) => (called = true,  v1 === v2);
         var p = new Property<Model, number>({ value: 1, compare: compare });
         var m = new Model();
         p.coerce(m);
