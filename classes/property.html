@@ -148,7 +148,7 @@
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><a href="property.html#_coercevalue" class="tsd-kind-icon">_coerce<wbr>Value</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><a href="property.html#_comparevalues" class="tsd-kind-icon">_compare<wbr>Values</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><a href="property.html#_createvalue" class="tsd-kind-icon">_create<wbr>Value</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><a href="property.html#_notifyifchanged" class="tsd-kind-icon">_notify<wbr>IfChanged</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><a href="property.html#_maybenotify" class="tsd-kind-icon">_maybe<wbr>Notify</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="property.html#coerce" class="tsd-kind-icon">coerce</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="property.html#get" class="tsd-kind-icon">get</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="property.html#set" class="tsd-kind-icon">set</a></li>
@@ -201,7 +201,7 @@
 					<div class="tsd-signature tsd-kind-icon">_changed<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">function</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/phosphorjs/phosphor-properties/blob/HEAD/src/index.ts#L279">index.ts:279</a></li>
+							<li>Defined in <a href="https://github.com/phosphorjs/phosphor-properties/blob/HEAD/src/index.ts#L277">index.ts:277</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-type-declaration">
@@ -238,7 +238,7 @@
 					<div class="tsd-signature tsd-kind-icon">_coerce<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">function</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/phosphorjs/phosphor-properties/blob/HEAD/src/index.ts#L277">index.ts:277</a></li>
+							<li>Defined in <a href="https://github.com/phosphorjs/phosphor-properties/blob/HEAD/src/index.ts#L275">index.ts:275</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-type-declaration">
@@ -272,7 +272,7 @@
 					<div class="tsd-signature tsd-kind-icon">_compare<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">function</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/phosphorjs/phosphor-properties/blob/HEAD/src/index.ts#L278">index.ts:278</a></li>
+							<li>Defined in <a href="https://github.com/phosphorjs/phosphor-properties/blob/HEAD/src/index.ts#L276">index.ts:276</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-type-declaration">
@@ -306,7 +306,7 @@
 					<div class="tsd-signature tsd-kind-icon">_create<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">function</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/phosphorjs/phosphor-properties/blob/HEAD/src/index.ts#L276">index.ts:276</a></li>
+							<li>Defined in <a href="https://github.com/phosphorjs/phosphor-properties/blob/HEAD/src/index.ts#L274">index.ts:274</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-type-declaration">
@@ -337,7 +337,7 @@
 					<div class="tsd-signature tsd-kind-icon">_pid<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/phosphorjs/phosphor-properties/blob/HEAD/src/index.ts#L275">index.ts:275</a></li>
+							<li>Defined in <a href="https://github.com/phosphorjs/phosphor-properties/blob/HEAD/src/index.ts#L273">index.ts:273</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -347,7 +347,7 @@
 					<div class="tsd-signature tsd-kind-icon">_value<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">U</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/phosphorjs/phosphor-properties/blob/HEAD/src/index.ts#L274">index.ts:274</a></li>
+							<li>Defined in <a href="https://github.com/phosphorjs/phosphor-properties/blob/HEAD/src/index.ts#L272">index.ts:272</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -400,7 +400,7 @@
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Compare the old value and new value for inequality.</p>
+									<p>Compare the old value and new value for equality.</p>
 								</div>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -445,10 +445,10 @@
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-private">
-					<a name="_notifyifchanged" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagPrivate">Private</span> _notify<wbr>IfChanged</h3>
+					<a name="_maybenotify" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagPrivate">Private</span> _maybe<wbr>Notify</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-private">
-						<li class="tsd-signature tsd-kind-icon">_notify<wbr>IfChanged<span class="tsd-signature-symbol">(</span>owner<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">T</span>, oldValue<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">U</span>, newValue<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">U</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+						<li class="tsd-signature tsd-kind-icon">_maybe<wbr>Notify<span class="tsd-signature-symbol">(</span>owner<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">T</span>, oldValue<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">U</span>, newValue<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">U</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
@@ -639,7 +639,7 @@
 								<a href="property.html#_createvalue" class="tsd-kind-icon">_create<wbr>Value</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-private">
-								<a href="property.html#_notifyifchanged" class="tsd-kind-icon">_notify<wbr>IfChanged</a>
+								<a href="property.html#_maybenotify" class="tsd-kind-icon">_maybe<wbr>Notify</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="property.html#coerce" class="tsd-kind-icon">coerce</a>
