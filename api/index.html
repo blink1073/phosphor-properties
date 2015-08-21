@@ -1,0 +1,445 @@
+<!doctype html>
+<html class="default no-js">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>phosphor-properties</title>
+	<meta name="description" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="assets/css/main.css">
+	<script src="assets/js/modernizr.js"></script>
+</head>
+<body>
+<header>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="assets/js/search.js" data-base=".">
+					<div class="field">
+						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="index.html" class="title">phosphor-properties</a>
+				</div>
+				<div class="table-cell" id="tsd-widgets">
+					<div id="tsd-filter">
+						<a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a>
+						<div class="tsd-filter-group">
+							<div class="tsd-select" id="tsd-filter-visibility">
+								<span class="tsd-select-label">All</span>
+								<ul class="tsd-select-list">
+									<li data-value="public">Public</li>
+									<li data-value="protected">Public/Protected</li>
+									<li data-value="private" class="selected">All</li>
+								</ul>
+							</div>
+							<input type="checkbox" id="tsd-filter-inherited" checked />
+							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+							<input type="checkbox" id="tsd-filter-externals" checked />
+							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
+							<input type="checkbox" id="tsd-filter-only-exported" />
+							<label class="tsd-widget" for="tsd-filter-only-exported">Only exported</label>
+						</div>
+					</div>
+					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<ul class="tsd-breadcrumb">
+				<li>
+					<a href="globals.html">Globals</a>
+				</li>
+			</ul>
+			<h1> phosphor-properties</h1>
+		</div>
+	</div>
+</header>
+<div class="container container-main">
+	<div class="row">
+		<div class="col-8 col-content">
+			<div class="tsd-panel tsd-typography">
+				<h1 id="phosphor-properties">phosphor-properties</h1>
+				<p>A module for attached property descriptors.</p>
+				<p><a href="http://phosphorjs.github.io/phosphor-properties/">API Docs</a></p>
+				<h2 id="package-install">Package Install</h2>
+				<p><strong>Prerequisites</strong></p>
+				<ul>
+					<li><a href="http://nodejs.org/">node</a></li>
+				</ul>
+				<pre><code class="lang-bash">npm install --save phosphor-properties
+</code></pre>
+				<h2 id="source-build">Source Build</h2>
+				<p><strong>Prerequisites</strong></p>
+				<ul>
+					<li><a href="http://git-scm.com/">git</a></li>
+					<li><a href="http://nodejs.org/">node</a></li>
+				</ul>
+				<pre><code class="lang-bash">git <span class="hljs-built_in">clone</span> https://github.com/phosphorjs/phosphor-properties.git
+<span class="hljs-built_in">cd</span> phosphor-properties
+npm install
+</code></pre>
+				<p><strong>Rebuild</strong></p>
+				<pre><code class="lang-bash">npm run clean
+npm run build
+</code></pre>
+				<h2 id="run-tests">Run Tests</h2>
+				<p>Follow the source build instructions first.</p>
+				<pre><code class="lang-bash">npm <span class="hljs-built_in">test</span>
+</code></pre>
+				<h2 id="build-docs">Build Docs</h2>
+				<p>Follow the source build instructions first.</p>
+				<pre><code class="lang-bash">npm run docs
+</code></pre>
+				<p>Navigate to <code>docs/index.html</code>.</p>
+				<h2 id="supported-runtimes">Supported Runtimes</h2>
+				<p>The runtime versions which are currently <em>known to work</em> are listed below.
+				Earlier versions may also work, but come with no guarantees.</p>
+				<ul>
+					<li>Node 0.12.7+</li>
+					<li>IE 11+</li>
+					<li>Firefox 32+</li>
+					<li>Chrome 38+</li>
+				</ul>
+				<h2 id="usage-examples">Usage Examples</h2>
+				<p><strong>Note:</strong> This module is fully compatible with Node/Babel/ES6/ES5. Simply
+				omit the type declarations when using a language other than TypeScript.</p>
+				<p><strong>Raw API:</strong></p>
+				<p>Consumers of a class will not typically interact with properties directly.
+					The following examples demonstrate the Property API which will be used by
+					class authors to define the behavior of a class&#39; properties. Most classes
+					will encapsulate property access for the user by exposing the properties
+					as getters/setters or static methods. See the subsequent section for
+				recommended design patterns.</p>
+				<pre><code class="lang-typescript"><span class="hljs-keyword">import</span> { IPropertyChangedArgs, IPropertyOwner, Property } from <span class="hljs-string">'phosphor-properties'</span>;
+
+<span class="hljs-keyword">import</span> { ISignal, defineSignal } from <span class="hljs-string">'phosphor-signaling'</span>;
+
+
+<span class="hljs-comment">// Any object can be used as a model, provided it implements `IPropertyOwner`.</span>
+<span class="hljs-keyword">class</span> Model <span class="hljs-keyword">implements</span> IPropertyOwner {
+  <span class="hljs-comment">/**
+   * A signal emitted automatically when a property is changed.
+   */</span>
+  @defineSignal
+  propertyChanged: ISignal&lt;IPropertyChangedArgs&gt;;
+}
+
+<span class="hljs-keyword">var</span> model1 = <span class="hljs-keyword">new</span> Model();
+<span class="hljs-keyword">var</span> model2 = <span class="hljs-keyword">new</span> Model();
+
+
+<span class="hljs-comment">// simple number property</span>
+<span class="hljs-keyword">var</span> valueProperty = <span class="hljs-keyword">new</span> Property&lt;Model, <span class="hljs-built_in">number</span>&gt;({
+  value: <span class="hljs-number">42</span>,
+});
+valueProperty.get(model1);      <span class="hljs-comment">// 42</span>
+valueProperty.set(model1, <span class="hljs-number">84</span>);  <span class="hljs-comment">//</span>
+valueProperty.get(model1);      <span class="hljs-comment">// 84</span>
+valueProperty.get(model2);      <span class="hljs-comment">// 42</span>
+
+
+<span class="hljs-comment">// default value factory</span>
+<span class="hljs-keyword">var</span> listProperty = <span class="hljs-keyword">new</span> Property&lt;Model, <span class="hljs-built_in">number</span>[]&gt;({
+  create: model =&gt; [<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>],
+});
+<span class="hljs-keyword">var</span> l1 = listProperty.get(model1);  <span class="hljs-comment">// [1, 2, 3]</span>
+<span class="hljs-keyword">var</span> l2 = listProperty.get(model2);  <span class="hljs-comment">// [1, 2, 3]</span>
+l1 === l2;                          <span class="hljs-comment">// false</span>
+
+
+<span class="hljs-comment">// coerce value callback</span>
+<span class="hljs-keyword">var</span> minValue = <span class="hljs-number">0</span>;
+<span class="hljs-keyword">var</span> limitProperty = <span class="hljs-keyword">new</span> Property&lt;Model, <span class="hljs-built_in">number</span>&gt;({
+  value: <span class="hljs-number">0</span>,
+  coerce: (model, value) =&gt; <span class="hljs-built_in">Math</span>.max(minValue, value),
+});
+limitProperty.set(model1, -<span class="hljs-number">10</span>);  <span class="hljs-comment">//</span>
+limitProperty.get(model1);       <span class="hljs-comment">// 0</span>
+limitProperty.set(model1, <span class="hljs-number">42</span>);   <span class="hljs-comment">//</span>
+limitProperty.get(model1);       <span class="hljs-comment">// 42</span>
+minValue = <span class="hljs-number">100</span>;                  <span class="hljs-comment">//</span>
+limitProperty.coerce(model1);    <span class="hljs-comment">//</span>
+limitProperty.get(model1);       <span class="hljs-comment">// 100</span>
+
+
+<span class="hljs-comment">// value changed callback</span>
+<span class="hljs-keyword">var</span> loggingProperty = <span class="hljs-keyword">new</span> Property&lt;Model, <span class="hljs-built_in">number</span>&gt;({
+  value: <span class="hljs-number">0</span>,
+  changed: (model, oldValue, newValue) =&gt; {
+    <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'changed:'</span>, oldValue, newValue);
+  },
+});
+loggingProperty.set(model1, <span class="hljs-number">10</span>);  <span class="hljs-comment">// changed: 0 10</span>
+loggingProperty.set(model1, <span class="hljs-number">42</span>);  <span class="hljs-comment">// changed: 10 42</span>
+
+
+<span class="hljs-comment">// compare values callback (assume a `deepEqual` function exists)</span>
+<span class="hljs-keyword">var</span> objectProperty = <span class="hljs-keyword">new</span> Property&lt;Model, <span class="hljs-built_in">any</span>&gt;({
+  compare: (oldValue, newValue) =&gt; deepEqual(oldValue, newValue),
+  changed: (model, oldValue, newValue) =&gt; {
+    <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'changed:'</span>, oldValue, newValue);
+  },
+});
+loggingProperty.set(model1, { a: <span class="hljs-number">1</span>, b: <span class="hljs-number">2</span> });  <span class="hljs-comment">// changed: undefined { a: 1, b: 2 }</span>
+loggingProperty.set(model1, { a: <span class="hljs-number">1</span>, b: <span class="hljs-number">2</span> });  <span class="hljs-comment">//</span>
+loggingProperty.set(model1, [<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>]);       <span class="hljs-comment">// changed: { a: 1, b: 2 } [1, 2, 3]</span>
+loggingProperty.set(model1, [<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>]);       <span class="hljs-comment">//</span>
+loggingProperty.set(model1, <span class="hljs-built_in">void</span> <span class="hljs-number">0</span>);          <span class="hljs-comment">// changed: [1, 2, 3] undefined</span>
+
+
+<span class="hljs-comment">// `propertyChanged` signal</span>
+model1.propertyChanged.connect(args =&gt; {
+  <span class="hljs-keyword">if</span> (args.property === valueProperty) {
+    <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'value changed:'</span>, args.oldValue, args.newValue);
+  }
+});
+valueProperty.set(model1, <span class="hljs-number">0</span>);  <span class="hljs-comment">// value changed: 84 0</span>
+</code></pre>
+				<p><strong>Recommended Design Patterns:</strong></p>
+				<p>Class authors should strive to maintain consistency in how their classes
+					expose properties to consumers. The PhosphorJS project has adopted a set
+					of conventions which cover property naming, behavior, and exposure. It is
+					recommended for third party libraries to adopt these same conventions in
+					order to ensure API consistency and maximal compatibility with libraries
+				and meta tools which rely on these conventions.</p>
+				<p>When defining a property for use by instances of the <strong>same</strong> class:</p>
+				<ul>
+					<li><p>Define the property as a static member of the class.</p>
+					</li>
+					<li><p>Ensure the class type is used as the property owner type.</p>
+					</li>
+					<li><p>Append the suffix <code>&#39;Property&#39;</code> to the static member name.</p>
+					</li>
+					<li><p>Define a public getter/setter which delegates access to the
+							static property. The getter/setter should contain no logic
+						outside of delegation to the static property.</p>
+					</li>
+					<li><p>The name of the getter/setter should be the same as the name
+						of the static property minus the <code>&#39;Property&#39;</code> suffix.</p>
+					</li>
+					<li><p>Consumers should normally use the getter/setter to access the
+							property, but meta tools and code generators are free to use
+							the property API directly. This is why the getter/setter must
+						be a pure delegate as described above.</p>
+					</li>
+				</ul>
+				<pre><code class="lang-typescript"><span class="hljs-keyword">class</span> MyObject <span class="hljs-keyword">implements</span> IPropertyOwner {
+
+  <span class="hljs-keyword">static</span> valueProperty = <span class="hljs-keyword">new</span> Property&lt;MyObject, <span class="hljs-built_in">number</span>&gt;({
+    value: <span class="hljs-number">42</span>,
+    changed: onValueChanged,
+  });
+
+  @defineSignal
+  propertyChanged: ISignal&lt;IPropertyChangedArgs&gt;;
+
+  <span class="hljs-keyword">get</span> value(): <span class="hljs-built_in">number</span> {
+    <span class="hljs-keyword">return</span> MyObject.valueProperty.get(<span class="hljs-keyword">this</span>);
+  }
+
+  <span class="hljs-keyword">set</span> value(value: <span class="hljs-built_in">number</span>) {
+    MyObject.valueProperty.set(<span class="hljs-keyword">this</span>, value);
+  }
+}
+
+
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">onValueChanged</span>(<span class="hljs-params">owner: MyObject, oldValue: <span class="hljs-built_in">number</span>, newValue: <span class="hljs-built_in">number</span></span>): <span class="hljs-title">void</span> </span>{
+  <span class="hljs-comment">// Handle the value change. Module-private functions can be considered</span>
+  <span class="hljs-comment">// "friend" functions of the owner object, and casting it to &lt;any&gt; in</span>
+  <span class="hljs-comment">// order to call private or protected methods is a valid pattern.</span>
+}
+
+
+<span class="hljs-keyword">var</span> obj = <span class="hljs-keyword">new</span> MyObject();
+obj.value;       <span class="hljs-comment">// 42</span>
+obj.value = <span class="hljs-number">17</span>;  <span class="hljs-comment">//</span>
+obj.value;       <span class="hljs-comment">// 17</span>
+</code></pre>
+				<p>When defining a property for use by instances of a <strong>different</strong> class:</p>
+				<ul>
+					<li><p>Define the property as a static member of the class.</p>
+					</li>
+					<li><p>Ensure the instance type is used as the property owner type.</p>
+					</li>
+					<li><p>Append the suffix <code>&#39;Property&#39;</code> to the static member name.</p>
+					</li>
+					<li><p>Define static methods to get and set the value of the property
+							for a particular instance of the owner type. These two methods
+							should contain no logic outside of delegation to the static
+						property.</p>
+					</li>
+					<li><p>Name the static methods by prepending <code>&#39;get&#39;</code> and <code>&#39;set&#39;</code> to
+						the capitalized property name. Omit the <code>&#39;Property&#39;</code> suffix.</p>
+					</li>
+					<li><p>Consumers should normally use the static methods to access the
+							property, but meta tools and code generators are free to use
+							the property API directly. This is why the methods must be
+						pure delegates as described above.</p>
+					</li>
+				</ul>
+				<p>This pattern is commonly referred to as an <em>attached property</em>. The
+					behavior and semantics of the property are defined by one class, but
+					the property value belongs to a foreign instance. This pattern is useful
+					when creating container objects which must associate container data with
+					child objects in a way which doesn&#39;t require polluting the child class
+				with extraneous data members.</p>
+				<pre><code class="lang-typescript"><span class="hljs-keyword">import</span> { emitter } from <span class="hljs-string">'phosphor-signaling'</span>;
+
+
+<span class="hljs-keyword">class</span> MyWidget <span class="hljs-keyword">implements</span> IPropertyOwner {
+
+  @defineSignal
+  propertyChanged: ISignal&lt;IPropertyChangedArgs&gt;;
+}
+
+
+<span class="hljs-keyword">class</span> MyContainer {
+
+  <span class="hljs-keyword">static</span> stretchProperty = <span class="hljs-keyword">new</span> Property&lt;MyWidget, <span class="hljs-built_in">number</span>&gt;({
+    value: <span class="hljs-number">0</span>,
+    coerce: (owner, value) =&gt; <span class="hljs-built_in">Math</span>.max(<span class="hljs-number">0</span>, value),
+  });
+
+  <span class="hljs-keyword">static</span> getStretch(widget: MyWidget): <span class="hljs-built_in">number</span> {
+    <span class="hljs-keyword">return</span> MyContainer.stretchProperty.get(widget);
+  }
+
+  <span class="hljs-keyword">static</span> setStretch(widget: MyWidget, value: <span class="hljs-built_in">number</span>): <span class="hljs-built_in">void</span> {
+    MyContainer.stretchProperty.set(widget, value);
+  }
+
+  addWidget(widget: MyWidget): <span class="hljs-built_in">void</span> {
+    <span class="hljs-keyword">this</span>._addWidget(widget);
+    widget.propertyChanged.connect(<span class="hljs-keyword">this</span>._onWidgetChanged, <span class="hljs-keyword">this</span>);
+  }
+
+  <span class="hljs-keyword">private</span> _addWidget(widget: MyWidget): <span class="hljs-built_in">void</span> {
+    <span class="hljs-keyword">var</span> stretch = MyContainer.getStretch(widget);
+    <span class="hljs-keyword">this</span>._widgets.push(widget);
+    <span class="hljs-comment">// update layout with the stretch factor</span>
+  }
+
+  <span class="hljs-keyword">private</span> _onWidgetChanged(args: IPropertyChangedArgs): <span class="hljs-built_in">void</span> {
+    <span class="hljs-keyword">if</span> (args.property === MyContainer.stretchProperty) {
+      <span class="hljs-keyword">var</span> widget = &lt;MyWidget&gt;emitter();
+      <span class="hljs-keyword">var</span> stretch = &lt;<span class="hljs-built_in">number</span>&gt;args.newValue;
+      <span class="hljs-comment">// update layout with the stretch factor</span>
+    }
+  }
+
+  <span class="hljs-keyword">private</span> _widgets: MyWidget[] = [];
+}
+
+
+<span class="hljs-keyword">var</span> widget = <span class="hljs-keyword">new</span> MyWidget();
+MyContainer.setStretch(widget, <span class="hljs-number">3</span>);
+
+<span class="hljs-keyword">var</span> container = <span class="hljs-keyword">new</span> MyContainer();
+container.addWidget(widget);
+</code></pre>
+			</div>
+		</div>
+		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class="globals  ">
+						<a href="globals.html"><em>Globals</em></a>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary menu-sticky">
+				<ul class="before-current">
+					<li class=" tsd-kind-class tsd-has-type-parameter">
+						<a href="classes/property.html" class="tsd-kind-icon">Property</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/ipropertychangedargs.html" class="tsd-kind-icon">IProperty<wbr>Changed<wbr>Args</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-has-type-parameter">
+						<a href="interfaces/ipropertyoptions.html" class="tsd-kind-icon">IProperty<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/ipropertyowner.html" class="tsd-kind-icon">IProperty<wbr>Owner</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#clearpropertydata" class="tsd-kind-icon">clear<wbr>Property<wbr>Data</a>
+					</li>
+				</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<footer class="with-border-bottom">
+	<div class="container">
+		<h2>Legend</h2>
+		<div class="tsd-legend-group">
+			<ul class="tsd-legend">
+				<li class="tsd-kind-module"><span class="tsd-kind-icon">Module</span></li>
+				<li class="tsd-kind-object-literal"><span class="tsd-kind-icon">Object literal</span></li>
+				<li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li>
+				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
+				<li class="tsd-kind-function tsd-has-type-parameter"><span class="tsd-kind-icon">Function with type parameter</span></li>
+				<li class="tsd-kind-index-signature"><span class="tsd-kind-icon">Index signature</span></li>
+				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
+				<li class="tsd-kind-enum-member"><span class="tsd-kind-icon">Enumeration member</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-enum"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-enum"><span class="tsd-kind-icon">Method</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
+				<li class="tsd-kind-interface tsd-has-type-parameter"><span class="tsd-kind-icon">Interface with type parameter</span></li>
+				<li class="tsd-kind-constructor tsd-parent-kind-interface"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-interface"><span class="tsd-kind-icon">Method</span></li>
+				<li class="tsd-kind-index-signature tsd-parent-kind-interface"><span class="tsd-kind-icon">Index signature</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
+				<li class="tsd-kind-class tsd-has-type-parameter"><span class="tsd-kind-icon">Class with type parameter</span></li>
+				<li class="tsd-kind-constructor tsd-parent-kind-class"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class"><span class="tsd-kind-icon">Accessor</span></li>
+				<li class="tsd-kind-index-signature tsd-parent-kind-class"><span class="tsd-kind-icon">Index signature</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static property</span></li>
+				<li class="tsd-kind-call-signature tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static method</span></li>
+			</ul>
+		</div>
+	</div>
+</footer>
+<div class="container tsd-generator">
+	<p>Generated using <a href="http://typedoc.io" target="_blank">TypeDoc</a></p>
+</div>
+<div class="overlay"></div>
+<script src="assets/js/main.js"></script>
+<script>if (location.protocol == 'file:') document.write('<script src="assets/js/search.js"><' + '/script>');</script>
+</body>
+</html>
