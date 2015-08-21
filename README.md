@@ -258,11 +258,11 @@ When defining a property for use by instances of a **different** class:
     pure delegates as described above.
 
 This pattern is commonly referred to as an *attached property*. The
-behavioral semantics of the property is defined by one class, but the
-property data belongs to a foreign instance. This pattern is useful
-when creating container objects which must associate container data
-with child objects in a way which doesn't require polluting the child
-class with extraneous data members.
+behavior and semantics of the property are defined by one class, but
+the property value belongs to a foreign instance. This pattern is useful
+when creating container objects which must associate container data with
+child objects in a way which doesn't require polluting the child class
+with extraneous data members.
 
 ```typescript
 import { emitter } from 'phosphor-signaling';
