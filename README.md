@@ -78,11 +78,13 @@ Usage Examples
 omit the type declarations when using a language other than TypeScript.
 
 **Raw API:**
+
 Consumers of a class will not typically interact with properties directly.
 The following examples demonstrate the Property API which will be used by
-class authors. Most classes will encapsulate property access for the user
-by exposing the properties as getters/setters or static methods. See the
-subsequent section for examples of recommended design patterns.
+class authors to define the behavior of a class' properties. Most classes
+will encapsulate property access for the user by exposing the properties
+as getters/setters or static methods. See the subsequent section for
+recommended design patterns.
 
 ```typescript
 import { IPropertyChangedArgs, IPropertyOwner, Property } from 'phosphor-properties';
@@ -173,15 +175,16 @@ valueProperty.set(model1, 0);  // value changed: 84 0
 
 **Recommended Design Patterns:**
 
-Class authors should strive to maintain consistency in how classes expose
-their properties to consumers. The PhosphorJS project has adopted Property
-conventions which cover naming and behavior. It is suggested that third
-party libraries adopt these same conventions to ensure API consistency
-and maximal compatibility with libraries which rely on convention.
+Class authors should strive to maintain consistency in how their classes
+expose properties to consumers. The PhosphorJS project has adopted a set
+of conventions which cover property naming, behavior, and exposure. It is
+recommended for third party libraries to adopt these same conventions in
+order to ensure API consistency and maximal compatibility with libraries
+and meta tools which rely on these conventions.
 
 ```typescript
 /**
- * When defining a property for use by instances of **the same class:**:
+ * When defining a property for use by instances of the **same** class:
  *
  *   - Define the property as a static member of the class.
  *
@@ -190,8 +193,8 @@ and maximal compatibility with libraries which rely on convention.
  *   - Append the suffix 'Property' to the static member name.
  *
  *   - Define a public getter/setter which delegates access to the
- *     static property. The getter/setter should not perform extra
- *     logic outside of delegation to the static property.
+ *     static property. The getter/setter should contain no logic
+ *     outside of delegation to the static property.
  *
  *   - The name of the getter/setter should be the same as the name
  *     of the static property minus the 'Property' suffix.
@@ -235,7 +238,7 @@ obj.value;       // 17
 
 
 /**
- * When defining a property for use by instances of **a different class:**:
+ * When defining a property for use by instances of a **different** class:
  *
  *   - Define the property as a static member of the class.
  *
@@ -245,8 +248,8 @@ obj.value;       // 17
  *
  *   - Define static methods to get and set the value of the property
  *     for a particular instance of the owner type. These two methods
- *     should not perform extra logic outside of delegation to the
- *     static property.
+ *     should contain no logic outside of delegation to the static
+ *     property.
  *
  *   - Name the static methods by prepending 'get' and 'set' to the
  *     capitalized property name. Omit the 'Property' suffix.
@@ -257,12 +260,15 @@ obj.value;       // 17
  *     pure delegates as described above.
  *
  * This pattern is commonly referred to as an "attached property". The
- * behavioral semantics of the property belong to one class, but the
+ * behavioral semantics of the property is defined by one class, but the
  * property data belongs to a foreign instance. This pattern is useful
  * when creating container objects which must associate container data
- * with child objects in a way which doesn't require poluting the child
+ * with child objects in a way which doesn't require polluting the child
  * class with extraneous data members.
  */
+import { emitter } from 'phosphor-signaling';
+
+
 class MyWidget implements IPropertyOwner {
 
   @defineSignal
