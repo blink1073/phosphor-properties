@@ -215,14 +215,14 @@ valueProperty.set(model1, <span class="hljs-number">0</span>);  <span class="hlj
 					</li>
 					<li><p>Ensure the class type is used as the property owner type.</p>
 					</li>
-					<li><p>Append the suffix &#39;Property&#39; to the static member name.</p>
+					<li><p>Append the suffix <code>&#39;Property&#39;</code> to the static member name.</p>
 					</li>
 					<li><p>Define a public getter/setter which delegates access to the
 							static property. The getter/setter should contain no logic
 						outside of delegation to the static property.</p>
 					</li>
 					<li><p>The name of the getter/setter should be the same as the name
-						of the static property minus the &#39;Property&#39; suffix.</p>
+						of the static property minus the <code>&#39;Property&#39;</code> suffix.</p>
 					</li>
 					<li><p>Consumers should normally use the getter/setter to access the
 							property, but meta tools and code generators are free to use
@@ -268,15 +268,15 @@ obj.value;       <span class="hljs-comment">// 17</span>
 					</li>
 					<li><p>Ensure the instance type is used as the property owner type.</p>
 					</li>
-					<li><p>Append the suffix &#39;Property&#39; to the static member name.</p>
+					<li><p>Append the suffix <code>&#39;Property&#39;</code> to the static member name.</p>
 					</li>
 					<li><p>Define static methods to get and set the value of the property
 							for a particular instance of the owner type. These two methods
 							should contain no logic outside of delegation to the static
 						property.</p>
 					</li>
-					<li><p>Name the static methods by prepending &#39;get&#39; and &#39;set&#39; to the
-						capitalized property name. Omit the &#39;Property&#39; suffix.</p>
+					<li><p>Name the static methods by prepending <code>&#39;get&#39;</code> and <code>&#39;set&#39;</code> to
+						the capitalized property name. Omit the <code>&#39;Property&#39;</code> suffix.</p>
 					</li>
 					<li><p>Consumers should normally use the static methods to access the
 							property, but meta tools and code generators are free to use
