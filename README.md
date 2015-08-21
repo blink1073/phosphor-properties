@@ -291,22 +291,22 @@ class MyContainer {
   }
 
   addWidget(widget: MyWidget): void {
-  	this._addWidget(widget);
-  	widget.propertyChanged.connect(this._onWidgetChanged, this);
+    this._addWidget(widget);
+    widget.propertyChanged.connect(this._onWidgetChanged, this);
   }
 
   private _addWidget(widget: MyWidget): void {
-  	var stretch = MyContainer.getStretch(widget);
-  	this._widgets.push(widget);
-  	// update layout with the stretch factor
+    var stretch = MyContainer.getStretch(widget);
+    this._widgets.push(widget);
+    // update layout with the stretch factor
   }
 
   private _onWidgetChanged(args: IPropertyChangedArgs): void {
-  	if (args.property === MyContainer.stretchProperty) {
-  	  var widget = <MyWidget>emitter();
-  	  var stretch = <number>args.newValue;
-  	  // update layout with the stretch factor
-  	}
+    if (args.property === MyContainer.stretchProperty) {
+      var widget = <MyWidget>emitter();
+      var stretch = <number>args.newValue;
+      // update layout with the stretch factor
+    }
   }
 
   private _widgets: MyWidget[] = [];
