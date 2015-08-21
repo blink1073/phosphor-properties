@@ -74,12 +74,15 @@ Earlier versions may also work, but come with no guarantees.
 Usage Examples
 --------------
 
-**Note:** Except where explicitly noted in the examples, this module is fully
-compatible with Node/Babel/ES6/ES5. Simply omit the type declarations when
-using a language other than TypeScript.
+**Note:** This module is fully compatible with Node/Babel/ES6/ES5. Simply
+omit the type declarations when using a language other than TypeScript.
 
 **Raw API:**
-
+Consumers of a class will not typically interact with properties directly.
+The following examples demonstrate the Property API which will be used by
+class authors. Most classes will encapsulate property access for the user
+by exposing the properties as getters/setters or static methods. See the
+subsequent sections for examples of recommended design patterns.
 
 ```typescript
 import { IPropertyChangedArgs, IPropertyOwner, Property } from 'phosphor-properties';
@@ -120,17 +123,18 @@ l1 === l2;                          // false
 
 
 // coerce value callback
-var min = 0;
+var minValue = 0;
 var limitProperty = new Property<Model, number>({
   value: 0,
-  coerce: (model, value) => Math.max(min, value),
+  coerce: (model, value) => Math.max(minValue, value),
 });
 limitProperty.set(model1, -10);  //
 limitProperty.get(model1);       // 0
 limitProperty.set(model1, 42);   //
 limitProperty.get(model1);       // 42
-min = 100;                       //
-limitProperty.coerce(model1);    // 100
+minValue = 100;                  //
+limitProperty.coerce(model1);    //
+limitProperty.get(model1);       // 100
 
 
 // value changed callback
