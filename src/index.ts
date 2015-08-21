@@ -7,7 +7,9 @@
 |----------------------------------------------------------------------------*/
 'use strict';
 
-import { ISignal } from 'phosphor-signaling';
+import {
+  ISignal
+} from 'phosphor-signaling';
 
 
 /**

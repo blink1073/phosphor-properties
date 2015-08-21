@@ -9,7 +9,9 @@
 
 import expect = require('expect.js');
 
-import { ISignal, defineSignal, emitter } from 'phosphor-signaling';
+import {
+  ISignal, defineSignal, emitter
+} from 'phosphor-signaling';
 
 import {
   IPropertyChangedArgs, IPropertyOwner, Property, clearPropertyData
