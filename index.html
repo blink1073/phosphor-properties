@@ -108,10 +108,14 @@ npm run build
 					<li>Chrome 38+</li>
 				</ul>
 				<h2 id="usage-examples">Usage Examples</h2>
-				<p><strong>Note:</strong> Except where explicitly noted in the examples, this module is fully
-					compatible with Node/Babel/ES6/ES5. Simply omit the type declarations when
-				using a language other than TypeScript.</p>
-				<p><strong>Raw API:</strong></p>
+				<p><strong>Note:</strong> This module is fully compatible with Node/Babel/ES6/ES5. Simply
+				omit the type declarations when using a language other than TypeScript.</p>
+				<p><strong>Raw API:</strong>
+					Consumers of a class will not typically interact with properties directly.
+					The following examples demonstrate the Property API which will be used by
+					class authors. Most classes will encapsulate property access for the user
+					by exposing the properties as getters/setters or static methods. See the
+				subsequent sections for examples of recommended design patterns.</p>
 				<pre><code class="lang-typescript"><span class="hljs-keyword">import</span> { IPropertyChangedArgs, IPropertyOwner, Property } from <span class="hljs-string">'phosphor-properties'</span>;
 
 <span class="hljs-keyword">import</span> { ISignal, defineSignal } from <span class="hljs-string">'phosphor-signaling'</span>;
@@ -150,17 +154,18 @@ l1 === l2;                          <span class="hljs-comment">// false</span>
 
 
 <span class="hljs-comment">// coerce value callback</span>
-<span class="hljs-keyword">var</span> min = <span class="hljs-number">0</span>;
+<span class="hljs-keyword">var</span> minValue = <span class="hljs-number">0</span>;
 <span class="hljs-keyword">var</span> limitProperty = <span class="hljs-keyword">new</span> Property&lt;Model, <span class="hljs-built_in">number</span>&gt;({
   value: <span class="hljs-number">0</span>,
-  coerce: (model, value) =&gt; <span class="hljs-built_in">Math</span>.max(min, value),
+  coerce: (model, value) =&gt; <span class="hljs-built_in">Math</span>.max(minValue, value),
 });
 limitProperty.set(model1, -<span class="hljs-number">10</span>);  <span class="hljs-comment">//</span>
 limitProperty.get(model1);       <span class="hljs-comment">// 0</span>
 limitProperty.set(model1, <span class="hljs-number">42</span>);   <span class="hljs-comment">//</span>
 limitProperty.get(model1);       <span class="hljs-comment">// 42</span>
-min = <span class="hljs-number">100</span>;                       <span class="hljs-comment">//</span>
-limitProperty.coerce(model1);    <span class="hljs-comment">// 100</span>
+minValue = <span class="hljs-number">100</span>;                  <span class="hljs-comment">//</span>
+limitProperty.coerce(model1);    <span class="hljs-comment">//</span>
+limitProperty.get(model1);       <span class="hljs-comment">// 100</span>
 
 
 <span class="hljs-comment">// value changed callback</span>
