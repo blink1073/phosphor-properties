@@ -209,28 +209,28 @@ valueProperty.set(model1, <span class="hljs-number">0</span>);  <span class="hlj
 					recommended for third party libraries to adopt these same conventions in
 					order to ensure API consistency and maximal compatibility with libraries
 				and meta tools which rely on these conventions.</p>
-				<pre><code class="lang-typescript"><span class="hljs-comment">/**
- * When defining a property for use by instances of the **same** class:
- *
- *   - Define the property as a static member of the class.
- *
- *   - Ensure the class type is used as the property owner type.
- *
- *   - Append the suffix 'Property' to the static member name.
- *
- *   - Define a public getter/setter which delegates access to the
- *     static property. The getter/setter should contain no logic
- *     outside of delegation to the static property.
- *
- *   - The name of the getter/setter should be the same as the name
- *     of the static property minus the 'Property' suffix.
- *
- *   - Consumers should normally use the getter/setter to access the
- *     property, but meta tools and code generators are free to use
- *     the property API directly. This is why the getter/setter must
- *     be a pure delegate as described above.
- */</span>
-<span class="hljs-keyword">class</span> MyObject <span class="hljs-keyword">implements</span> IPropertyOwner {
+				<p>When defining a property for use by instances of the <strong>same</strong> class:</p>
+				<ul>
+					<li><p>Define the property as a static member of the class.</p>
+					</li>
+					<li><p>Ensure the class type is used as the property owner type.</p>
+					</li>
+					<li><p>Append the suffix &#39;Property&#39; to the static member name.</p>
+					</li>
+					<li><p>Define a public getter/setter which delegates access to the
+							static property. The getter/setter should contain no logic
+						outside of delegation to the static property.</p>
+					</li>
+					<li><p>The name of the getter/setter should be the same as the name
+						of the static property minus the &#39;Property&#39; suffix.</p>
+					</li>
+					<li><p>Consumers should normally use the getter/setter to access the
+							property, but meta tools and code generators are free to use
+							the property API directly. This is why the getter/setter must
+						be a pure delegate as described above.</p>
+					</li>
+				</ul>
+				<pre><code class="lang-typescript"><span class="hljs-keyword">class</span> MyObject <span class="hljs-keyword">implements</span> IPropertyOwner {
 
   <span class="hljs-keyword">static</span> valueProperty = <span class="hljs-keyword">new</span> Property&lt;MyObject, <span class="hljs-built_in">number</span>&gt;({
     value: <span class="hljs-number">42</span>,
@@ -261,38 +261,36 @@ valueProperty.set(model1, <span class="hljs-number">0</span>);  <span class="hlj
 obj.value;       <span class="hljs-comment">// 42</span>
 obj.value = <span class="hljs-number">17</span>;  <span class="hljs-comment">//</span>
 obj.value;       <span class="hljs-comment">// 17</span>
-
-
-<span class="hljs-comment">/**
- * When defining a property for use by instances of a **different** class:
- *
- *   - Define the property as a static member of the class.
- *
- *   - Ensure the instance type is used as the property owner type.
- *
- *   - Append the suffix 'Property' to the static member name.
- *
- *   - Define static methods to get and set the value of the property
- *     for a particular instance of the owner type. These two methods
- *     should contain no logic outside of delegation to the static
- *     property.
- *
- *   - Name the static methods by prepending 'get' and 'set' to the
- *     capitalized property name. Omit the 'Property' suffix.
- *
- *   - Consumers should normally use the static methods to access the
- *     property, but meta tools and code generators are free to use
- *     the property API directly. This is why the methods must be
- *     pure delegates as described above.
- *
- * This pattern is commonly referred to as an "attached property". The
- * behavioral semantics of the property is defined by one class, but the
- * property data belongs to a foreign instance. This pattern is useful
- * when creating container objects which must associate container data
- * with child objects in a way which doesn't require polluting the child
- * class with extraneous data members.
- */</span>
-<span class="hljs-keyword">import</span> { emitter } from <span class="hljs-string">'phosphor-signaling'</span>;
+</code></pre>
+				<p>When defining a property for use by instances of a <strong>different</strong> class:</p>
+				<ul>
+					<li><p>Define the property as a static member of the class.</p>
+					</li>
+					<li><p>Ensure the instance type is used as the property owner type.</p>
+					</li>
+					<li><p>Append the suffix &#39;Property&#39; to the static member name.</p>
+					</li>
+					<li><p>Define static methods to get and set the value of the property
+							for a particular instance of the owner type. These two methods
+							should contain no logic outside of delegation to the static
+						property.</p>
+					</li>
+					<li><p>Name the static methods by prepending &#39;get&#39; and &#39;set&#39; to the
+						capitalized property name. Omit the &#39;Property&#39; suffix.</p>
+					</li>
+					<li><p>Consumers should normally use the static methods to access the
+							property, but meta tools and code generators are free to use
+							the property API directly. This is why the methods must be
+						pure delegates as described above.</p>
+					</li>
+				</ul>
+				<p>This pattern is commonly referred to as an <em>attached property</em>. The
+					behavioral semantics of the property is defined by one class, but the
+					property data belongs to a foreign instance. This pattern is useful
+					when creating container objects which must associate container data
+					with child objects in a way which doesn&#39;t require polluting the child
+				class with extraneous data members.</p>
+				<pre><code class="lang-typescript"><span class="hljs-keyword">import</span> { emitter } from <span class="hljs-string">'phosphor-signaling'</span>;
 
 
 <span class="hljs-keyword">class</span> MyWidget <span class="hljs-keyword">implements</span> IPropertyOwner {
