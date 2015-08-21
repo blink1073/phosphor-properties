@@ -3,7 +3,7 @@ phosphor-properties
 
 A module for attached property descriptors.
 
-[API Docs](http://phosphorjs.github.io/phosphor-properties/)
+[API Docs](http://phosphorjs.github.io/phosphor-properties/api/)
 
 
 Package Install
