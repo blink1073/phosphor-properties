@@ -188,14 +188,14 @@ When defining a property for use by instances of the **same** class:
 
   - Ensure the class type is used as the property owner type.
 
-  - Append the suffix 'Property' to the static member name.
+  - Append the suffix `'Property'` to the static member name.
 
   - Define a public getter/setter which delegates access to the
     static property. The getter/setter should contain no logic
     outside of delegation to the static property.
 
   - The name of the getter/setter should be the same as the name
-    of the static property minus the 'Property' suffix.
+    of the static property minus the `'Property'` suffix.
 
   - Consumers should normally use the getter/setter to access the
     property, but meta tools and code generators are free to use
@@ -242,15 +242,15 @@ When defining a property for use by instances of a **different** class:
 
   - Ensure the instance type is used as the property owner type.
 
-  - Append the suffix 'Property' to the static member name.
+  - Append the suffix `'Property'` to the static member name.
 
   - Define static methods to get and set the value of the property
     for a particular instance of the owner type. These two methods
     should contain no logic outside of delegation to the static
     property.
 
-  - Name the static methods by prepending 'get' and 'set' to the
-    capitalized property name. Omit the 'Property' suffix.
+  - Name the static methods by prepending `'get'` and `'set'` to
+    the capitalized property name. Omit the `'Property'` suffix.
 
   - Consumers should normally use the static methods to access the
     property, but meta tools and code generators are free to use
