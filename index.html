@@ -316,22 +316,22 @@ obj.value;       <span class="hljs-comment">// 17</span>
   }
 
   addWidget(widget: MyWidget): <span class="hljs-built_in">void</span> {
-      <span class="hljs-keyword">this</span>._addWidget(widget);
-      widget.propertyChanged.connect(<span class="hljs-keyword">this</span>._onWidgetChanged, <span class="hljs-keyword">this</span>);
+    <span class="hljs-keyword">this</span>._addWidget(widget);
+    widget.propertyChanged.connect(<span class="hljs-keyword">this</span>._onWidgetChanged, <span class="hljs-keyword">this</span>);
   }
 
   <span class="hljs-keyword">private</span> _addWidget(widget: MyWidget): <span class="hljs-built_in">void</span> {
-      <span class="hljs-keyword">var</span> stretch = MyContainer.getStretch(widget);
-      <span class="hljs-keyword">this</span>._widgets.push(widget);
-      <span class="hljs-comment">// update layout with the stretch factor</span>
+    <span class="hljs-keyword">var</span> stretch = MyContainer.getStretch(widget);
+    <span class="hljs-keyword">this</span>._widgets.push(widget);
+    <span class="hljs-comment">// update layout with the stretch factor</span>
   }
 
   <span class="hljs-keyword">private</span> _onWidgetChanged(args: IPropertyChangedArgs): <span class="hljs-built_in">void</span> {
-      <span class="hljs-keyword">if</span> (args.property === MyContainer.stretchProperty) {
-        <span class="hljs-keyword">var</span> widget = &lt;MyWidget&gt;emitter();
-        <span class="hljs-keyword">var</span> stretch = &lt;<span class="hljs-built_in">number</span>&gt;args.newValue;
-        <span class="hljs-comment">// update layout with the stretch factor</span>
-      }
+    <span class="hljs-keyword">if</span> (args.property === MyContainer.stretchProperty) {
+      <span class="hljs-keyword">var</span> widget = &lt;MyWidget&gt;emitter();
+      <span class="hljs-keyword">var</span> stretch = &lt;<span class="hljs-built_in">number</span>&gt;args.newValue;
+      <span class="hljs-comment">// update layout with the stretch factor</span>
+    }
   }
 
   <span class="hljs-keyword">private</span> _widgets: MyWidget[] = [];
