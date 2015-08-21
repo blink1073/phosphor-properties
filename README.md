@@ -182,28 +182,27 @@ recommended for third party libraries to adopt these same conventions in
 order to ensure API consistency and maximal compatibility with libraries
 and meta tools which rely on these conventions.
 
+When defining a property for use by instances of the **same** class:
+
+  - Define the property as a static member of the class.
+
+  - Ensure the class type is used as the property owner type.
+
+  - Append the suffix 'Property' to the static member name.
+
+  - Define a public getter/setter which delegates access to the
+    static property. The getter/setter should contain no logic
+    outside of delegation to the static property.
+
+  - The name of the getter/setter should be the same as the name
+    of the static property minus the 'Property' suffix.
+
+  - Consumers should normally use the getter/setter to access the
+    property, but meta tools and code generators are free to use
+    the property API directly. This is why the getter/setter must
+    be a pure delegate as described above.
+
 ```typescript
-/**
- * When defining a property for use by instances of the **same** class:
- *
- *   - Define the property as a static member of the class.
- *
- *   - Ensure the class type is used as the property owner type.
- *
- *   - Append the suffix 'Property' to the static member name.
- *
- *   - Define a public getter/setter which delegates access to the
- *     static property. The getter/setter should contain no logic
- *     outside of delegation to the static property.
- *
- *   - The name of the getter/setter should be the same as the name
- *     of the static property minus the 'Property' suffix.
- *
- *   - Consumers should normally use the getter/setter to access the
- *     property, but meta tools and code generators are free to use
- *     the property API directly. This is why the getter/setter must
- *     be a pure delegate as described above.
- */
 class MyObject implements IPropertyOwner {
 
   static valueProperty = new Property<MyObject, number>({
@@ -235,37 +234,37 @@ var obj = new MyObject();
 obj.value;       // 42
 obj.value = 17;  //
 obj.value;       // 17
+```
 
+When defining a property for use by instances of a **different** class:
 
-/**
- * When defining a property for use by instances of a **different** class:
- *
- *   - Define the property as a static member of the class.
- *
- *   - Ensure the instance type is used as the property owner type.
- *
- *   - Append the suffix 'Property' to the static member name.
- *
- *   - Define static methods to get and set the value of the property
- *     for a particular instance of the owner type. These two methods
- *     should contain no logic outside of delegation to the static
- *     property.
- *
- *   - Name the static methods by prepending 'get' and 'set' to the
- *     capitalized property name. Omit the 'Property' suffix.
- *
- *   - Consumers should normally use the static methods to access the
- *     property, but meta tools and code generators are free to use
- *     the property API directly. This is why the methods must be
- *     pure delegates as described above.
- *
- * This pattern is commonly referred to as an "attached property". The
- * behavioral semantics of the property is defined by one class, but the
- * property data belongs to a foreign instance. This pattern is useful
- * when creating container objects which must associate container data
- * with child objects in a way which doesn't require polluting the child
- * class with extraneous data members.
- */
+  - Define the property as a static member of the class.
+
+  - Ensure the instance type is used as the property owner type.
+
+  - Append the suffix 'Property' to the static member name.
+
+  - Define static methods to get and set the value of the property
+    for a particular instance of the owner type. These two methods
+    should contain no logic outside of delegation to the static
+    property.
+
+  - Name the static methods by prepending 'get' and 'set' to the
+    capitalized property name. Omit the 'Property' suffix.
+
+  - Consumers should normally use the static methods to access the
+    property, but meta tools and code generators are free to use
+    the property API directly. This is why the methods must be
+    pure delegates as described above.
+
+This pattern is commonly referred to as an *attached property*. The
+behavioral semantics of the property is defined by one class, but the
+property data belongs to a foreign instance. This pattern is useful
+when creating container objects which must associate container data
+with child objects in a way which doesn't require polluting the child
+class with extraneous data members.
+
+```typescript
 import { emitter } from 'phosphor-signaling';
 
 
