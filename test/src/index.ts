@@ -15,7 +15,7 @@ import {
 
 import {
   IPropertyChangedArgs, IPropertyOwner, Property, clearPropertyData
-} from '../lib/index';
+} from '../../lib/index';
 
 
 class Model implements IPropertyOwner {
