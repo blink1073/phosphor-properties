@@ -29,7 +29,7 @@ describe('phosphor-properties', () => {
 
   describe('Property', () => {
 
-    describe('constructor', () => {
+    describe('#constructor()', () => {
 
       it('should accept zero arguments', () => {
         var p = new Property<Model, number>();
