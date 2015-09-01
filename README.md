@@ -1,6 +1,9 @@
 phosphor-properties
 ===================
 
+[![Build Status](https://travis-ci.org/phosphorjs/phosphor-properties.svg)](https://travis-ci.org/phosphorjs/phosphor-properties?branch=master)
+[![Coverage Status](https://coveralls.io/repos/phosphorjs/phosphor-properties/badge.svg?branch=master&service=github)](https://coveralls.io/github/phosphorjs/phosphor-properties?branch=master)
+
 A module for attached property descriptors.
 
 [API Docs](http://phosphorjs.github.io/phosphor-properties/api/)
