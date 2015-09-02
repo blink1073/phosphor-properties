@@ -84,7 +84,7 @@ omit the type declarations when using a language other than TypeScript.
 
 Consumers of a class will not typically interact with properties directly.
 The following examples demonstrate the Property API which will be used by
-class authors to define the behavior of a class' properties. Most classes
+class authors to define the behavior of a class's properties. Most classes
 will encapsulate property access for the user by exposing the properties
 as getters/setters or static methods. See the subsequent section for
 recommended design patterns.
