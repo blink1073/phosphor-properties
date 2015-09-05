@@ -8,15 +8,15 @@
 'use strict';
 
 import {
-  ISignal
+  ISignal, Signal
 } from 'phosphor-signaling';
 
 
 /**
- * The arguments object emitted with a [[propertyChanged]] signal.
+ * The arguments object emitted with a [[changedSignal]].
  */
 export
-interface IPropertyChangedArgs {
+interface IChangedArgs {
   /**
    * The property descriptor associated with the change.
    */
@@ -31,22 +31,6 @@ interface IPropertyChangedArgs {
    * The new value of the property.
    */
   newValue: any;
-}
-
-
-/**
- * An object which can be used with property descriptors.
- *
- * Any object can be used with property descriptors, provided that the
- * object has a [[propertyChanged]] signal. The signal will be emitted
- * automatically by the property descriptor when the value is changed.
- */
-export
-interface IPropertyOwner {
-  /**
-   * A signal emitted when the value of a property changes.
-   */
-  propertyChanged: ISignal<IPropertyChangedArgs>;
 }
 
 
@@ -108,8 +92,8 @@ interface IPropertyOptions<T, U> {
    * #### Notes
    * This will **not** be called for the initial default value.
    *
-   * This will be invoked **before** the [[propertyChanged]] signal
-   * is emitted on the property owner.
+   * This will be invoked **before** the [[changedSignal]] is emitted
+   * on the property owner.
    */
   changed?: (owner: T, oldValue: U, newValue: U) => void;
 }
@@ -125,8 +109,7 @@ interface IPropertyOptions<T, U> {
  *
  * #### Example
  * ```typescript
- * import { ISignal, defineSignal } from 'phosphor-signaling';
- * import { IPropertyChangedArgs, Property } from 'phosphor-properties';
+ * import { Property } from 'phosphor-properties';
  *
  * class MyClass {
  *
@@ -135,9 +118,6 @@ interface IPropertyOptions<T, U> {
  *      coerce: (owner, value) => Math.max(0, value),
  *      changed: (owner, oldValue, newValue) => { console.log(newValue); },
  *   });
- *
- *   @defineSignal
- *   propertyChanged: ISignal<IPropertyChangedArgs>;
  *
  *   get myValue(): number {
  *     return MyClass.myValueProperty.get(this);
@@ -150,7 +130,33 @@ interface IPropertyOptions<T, U> {
  * ```
  */
 export
-class Property<T extends IPropertyOwner, U> {
+class Property<T, U> {
+  /**
+   * A signal emitted when a property value changes.
+   *
+   * #### Notes
+   * This is an attached signal which will be emitted using the
+   * owner of the property value as the sender.
+   *
+   * **See also:** [[getChanged]]
+   */
+  static changedSignal = new Signal<any, IChangedArgs>();
+
+  /**
+   * Get a bound [[changedSignal]] for a given property owner.
+   *
+   * @param owner - The object to bind to the changed signal.
+   *
+   * @returns The bound changed signal for the owner.
+   *
+   * #### Notes
+   * This signal will be emitted whenever any property value
+   * for the specified owner is changed.
+   */
+  static getChanged<V>(owner: V): ISignal<V, IChangedArgs> {
+    return Property.changedSignal.bind(owner);
+  }
+
   /**
    * Construct a new property descriptor.
    *
@@ -195,7 +201,7 @@ class Property<T extends IPropertyOwner, U> {
    *
    * #### Notes
    * If this operation causes the property value to change, the
-   * `propertyChanged` signal of the owner will be emitted.
+   * [[changedSignal]] will be emitted with the owner as sender.
    *
    * If the value has not yet been set, the default value will be
    * computed and used as the previous value for the comparison.
@@ -219,7 +225,7 @@ class Property<T extends IPropertyOwner, U> {
    *
    * #### Notes
    * If this operation causes the property value to change, the
-   * `propertyChanged` signal of the owner will be emitted.
+   * [[changedSignal]] will be emitted with the owner as sender.
    *
    * If the value has not yet been set, the default value will be
    * computed and used as the previous value for the comparison.
@@ -255,7 +261,7 @@ class Property<T extends IPropertyOwner, U> {
   /**
    * Compare the old value and new value for equality.
    */
-  private _compareValues(oldValue: U, newValue: U): boolean {
+  private _compareValue(oldValue: U, newValue: U): boolean {
     var compare = this._compare;
     return compare ? compare(oldValue, newValue) : oldValue === newValue;
   }
@@ -264,10 +270,10 @@ class Property<T extends IPropertyOwner, U> {
    * Run the change notification if the given values are different.
    */
   private _maybeNotify(owner: T, oldValue: U, newValue: U): void {
-    if (!this._compareValues(oldValue, newValue)) {
+    if (!this._compareValue(oldValue, newValue)) {
       var changed = this._changed;
       if (changed) changed(owner, oldValue, newValue);
-      owner.propertyChanged.emit(changedArgs(this, oldValue, newValue));
+      Property.getChanged(owner).emit(changedArgs(this, oldValue, newValue));
     }
   }
 
@@ -287,10 +293,10 @@ class Property<T extends IPropertyOwner, U> {
  *
  * #### Notes
  * This will clear all property values for the owner, but it will
- * **not** emit any property change notifications.
+ * **not** emit any change notifications.
  */
 export
-function clearPropertyData(owner: IPropertyOwner): void {
+function clearPropertyData(owner: any): void {
   ownerData.delete(owner);
 }
 
@@ -304,7 +310,7 @@ type PropertyHash = { [key: string]: any };
 /**
  * A weak mapping of property owner to property hash.
  */
-var ownerData = new WeakMap<IPropertyOwner, PropertyHash>();
+var ownerData = new WeakMap<any, PropertyHash>();
 
 
 /**
@@ -314,9 +320,9 @@ var nextPID = (() => { var id = 0; return () => 'pid-' + id++; })();
 
 
 /**
- * Create the property changed args for the given property and values.
+ * Create the changed args for the given property and values.
  */
-function changedArgs(property: Property<any, any>, oldValue: any, newValue: any): IPropertyChangedArgs {
+function changedArgs(property: Property<any, any>, oldValue: any, newValue: any): IChangedArgs {
   return { property: property, oldValue: oldValue, newValue: newValue };
 }
 
@@ -326,7 +332,7 @@ function changedArgs(property: Property<any, any>, oldValue: any, newValue: any)
  *
  * This will create the hash if one does not already exist.
  */
-function lookupHash(owner: IPropertyOwner): PropertyHash {
+function lookupHash(owner: any): PropertyHash {
   var hash = ownerData.get(owner);
   if (hash !== void 0) return hash;
   hash = Object.create(null);
