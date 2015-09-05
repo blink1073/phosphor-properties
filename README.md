@@ -97,26 +97,20 @@ Consumers of a class will not typically interact with properties directly.
 The following examples demonstrate the Property API which will be used by
 class authors to define the behavior of a class's properties. Most classes
 will encapsulate property access for the user by exposing the properties
-as getters/setters or static methods. See the subsequent section for
+as getters/setters or static methods. See the subsequent sections for
 recommended design patterns.
 
 ```typescript
-import { IPropertyChangedArgs, IPropertyOwner, Property } from 'phosphor-properties';
-
-import { ISignal, defineSignal } from 'phosphor-signaling';
+import { Property } from 'phosphor-properties';
 
 
-// Any object can be used as a model, provided it implements `IPropertyOwner`.
-class Model implements IPropertyOwner {
-  /**
-   * A signal emitted automatically when a property is changed.
-   */
-  @defineSignal
-  propertyChanged: ISignal<IPropertyChangedArgs>;
+// Any object can be used as a model.
+class Model {
+  constructor(public name: string) { }
 }
 
-var model1 = new Model();
-var model2 = new Model();
+var model1 = new Model('foo');
+var model2 = new Model('bar');
 
 
 // simple number property
@@ -157,11 +151,11 @@ limitProperty.get(model1);       // 100
 var loggingProperty = new Property<Model, number>({
   value: 0,
   changed: (model, oldValue, newValue) => {
-    console.log('changed:', oldValue, newValue);
+    console.log('changed:', model.name, oldValue, newValue);
   },
 });
-loggingProperty.set(model1, 10);  // changed: 0 10
-loggingProperty.set(model1, 42);  // changed: 10 42
+loggingProperty.set(model1, 10);  // changed: 'foo' 0 10
+loggingProperty.set(model1, 42);  // changed: 'foo' 10 42
 
 
 // compare values callback (assume a `deepEqual` function exists)
@@ -178,13 +172,13 @@ loggingProperty.set(model1, [1, 2, 3]);       //
 loggingProperty.set(model1, void 0);          // changed: [1, 2, 3] undefined
 
 
-// `propertyChanged` signal
-model1.propertyChanged.connect(args => {
+// value changed signal
+Property.getChanged(model2).connect((sender, args) => {
   if (args.property === valueProperty) {
-    console.log('value changed:', args.oldValue, args.newValue);
+    console.log('value changed:', sender.name, args.oldValue, args.newValue);
   }
 });
-valueProperty.set(model1, 0);  // value changed: 84 0
+valueProperty.set(model2, 0);  // value changed: 'bar' 42 0
 ```
 
 **Recommended Design Patterns:**
@@ -217,15 +211,12 @@ When defining a property for use by instances of the **same** class:
     be a pure delegate as described above.
 
 ```typescript
-class MyObject implements IPropertyOwner {
+class MyObject {
 
   static valueProperty = new Property<MyObject, number>({
     value: 42,
     changed: onValueChanged,
   });
-
-  @defineSignal
-  propertyChanged: ISignal<IPropertyChangedArgs>;
 
   get value(): number {
     return MyObject.valueProperty.get(this);
@@ -279,13 +270,11 @@ child objects in a way which doesn't require polluting the child class
 with extraneous data members.
 
 ```typescript
-import { emitter } from 'phosphor-signaling';
+import { IChangedArgs } from 'phosphor-properties';
 
 
-class MyWidget implements IPropertyOwner {
-
-  @defineSignal
-  propertyChanged: ISignal<IPropertyChangedArgs>;
+class MyWidget {
+  // ...
 }
 
 
@@ -305,25 +294,23 @@ class MyContainer {
   }
 
   addWidget(widget: MyWidget): void {
-    this._addWidget(widget);
-    widget.propertyChanged.connect(this._onWidgetChanged, this);
+    this._addWidget(widget, MyContainer.getStretch(widget));
+    Property.getChanged(widget).connect(this._onWidgetChanged, this);
   }
 
-  private _addWidget(widget: MyWidget): void {
-    var stretch = MyContainer.getStretch(widget);
-    this._widgets.push(widget);
-    // update layout with the stretch factor
+  private _addWidget(widget: MyWidget, stretch: number): void {
+    // add the widget with the given stretch factor
   }
 
-  private _onWidgetChanged(args: IPropertyChangedArgs): void {
+  private _updateWidget(widget: MyWidget, stretch: number): void {
+    // update the widget with the given stretch factor
+  }
+
+  private _onWidgetChanged(sender: MyWidget, args: IChangedArgs): void {
     if (args.property === MyContainer.stretchProperty) {
-      var widget = <MyWidget>emitter();
-      var stretch = <number>args.newValue;
-      // update layout with the stretch factor
+      this._updateWidget(sender, <number>args.newValue);
     }
   }
-
-  private _widgets: MyWidget[] = [];
 }
 
 
