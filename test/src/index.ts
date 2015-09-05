@@ -10,18 +10,12 @@
 import expect = require('expect.js');
 
 import {
-  ISignal, defineSignal, emitter
-} from 'phosphor-signaling';
-
-import {
-  IPropertyChangedArgs, IPropertyOwner, Property, clearPropertyData
+  IChangedArgs, Property, clearPropertyData
 } from '../../lib/index';
 
 
-class Model implements IPropertyOwner {
-
-  @defineSignal
-  propertyChanged: ISignal<IPropertyChangedArgs>;
+class Model {
+  dummyValue = 42;
 }
 
 
@@ -208,7 +202,7 @@ describe('phosphor-properties', () => {
         expect(called).to.be(false);
       });
 
-      it('should not emit the `propertyChanged` signal', () => {
+      it('should not emit the `changedSignal`', () => {
         var called = false;
         var changed = () => { called = true; };
         var p1 = new Property<Model, number>({ value: 1 });
@@ -217,9 +211,9 @@ describe('phosphor-properties', () => {
         var m1 = new Model();
         var m2 = new Model();
         var m3 = new Model();
-        m1.propertyChanged.connect(changed);
-        m2.propertyChanged.connect(changed);
-        m3.propertyChanged.connect(changed);
+        Property.getChanged(m1).connect(changed);
+        Property.getChanged(m2).connect(changed);
+        Property.getChanged(m3).connect(changed);
         p1.get(m1);
         p2.get(m1);
         p3.get(m1);
@@ -292,12 +286,12 @@ describe('phosphor-properties', () => {
         expect(newvals).to.eql([1, 2, 3, 4, 5, 6, 7, 8, 9]);
       });
 
-      it('should emit the `propertyChanged` signal if the value changes', () => {
+      it('should emit the `changedSignal` if the value changes', () => {
         var models: Model[] = [];
         var oldvals: number[] = [];
         var newvals: number[] = [];
-        var changed = (args: IPropertyChangedArgs) => {
-          models.push(emitter());
+        var changed = (sender: Model, args: IChangedArgs) => {
+          models.push(sender);
           oldvals.push(args.oldValue);
           newvals.push(args.newValue);
         };
@@ -307,9 +301,9 @@ describe('phosphor-properties', () => {
         var m1 = new Model();
         var m2 = new Model();
         var m3 = new Model();
-        m1.propertyChanged.connect(changed);
-        m2.propertyChanged.connect(changed);
-        m3.propertyChanged.connect(changed);
+        Property.getChanged(m1).connect(changed);
+        Property.getChanged(m2).connect(changed);
+        Property.getChanged(m3).connect(changed);
         p1.set(m1, 1);
         p1.set(m2, 2);
         p1.set(m3, 3);
@@ -324,13 +318,13 @@ describe('phosphor-properties', () => {
         expect(newvals).to.eql([1, 2, 3, 4, 5, 6, 7, 8, 9]);
       });
 
-      it('should invoke the changed function before the `propertyChanged` signal', () => {
+      it('should invoke the changed function before the `changedSignal`', () => {
         var result: string[] = [];
         var changed1 = () => { result.push('c1'); };
         var changed2 = () => { result.push('c2'); };
         var p = new Property<Model, number>({ value: 0, changed: changed1 });
         var m = new Model();
-        m.propertyChanged.connect(changed2);
+        Property.getChanged(m).connect(changed2);
         p.set(m, 42);
         expect(result).to.eql(['c1', 'c2']);
       });
@@ -438,14 +432,14 @@ describe('phosphor-properties', () => {
         expect(called).to.be(false);
       });
 
-      it('should not emit the `propertyChanged` signal if the value does not change', () => {
+      it('should not emit the `changedSignal` if the value does not change', () => {
         var called = false;
         var changed = () => { called = true; };
         var compare = (v1: number, v2: number) => true;
         var p1 = new Property<Model, number>({ value: 1 });
         var p2 = new Property<Model, number>({ value: 1, compare: compare });
         var m = new Model();
-        m.propertyChanged.connect(changed);
+        Property.getChanged(m).connect(changed);
         p1.set(m, 1);
         p1.set(m, 1);
         p2.set(m, 1);
@@ -486,25 +480,25 @@ describe('phosphor-properties', () => {
         expect(called).to.be(true);
       });
 
-      it('should emit the `propertyChanged` signal if the value changes', () => {
+      it('should emit the `changedSignal` if the value changes', () => {
         var called = false;
         var coerce = (m: Model, v: number) => Math.max(20, v);
         var changed = () => { called = true };
         var p = new Property<Model, number>({ value: 0, coerce: coerce });
         var m = new Model();
-        m.propertyChanged.connect(changed);
+        Property.getChanged(m).connect(changed);
         p.coerce(m);
         expect(called).to.be(true);
       });
 
-      it('should invoke the changed function before the `propertyChanged` signal', () => {
+      it('should invoke the changed function before the `changedSignal`', () => {
         var result: string[] = [];
         var changed1 = () => { result.push('c1'); };
         var changed2 = () => { result.push('c2'); };
         var coerce = (m: Model, v: number) => Math.max(20, v);
         var p = new Property<Model, number>({ value: 0, coerce: coerce, changed: changed1 });
         var m = new Model();
-        m.propertyChanged.connect(changed2);
+        Property.getChanged(m).connect(changed2);
         p.coerce(m);
         expect(result).to.eql(['c1', 'c2']);
       });
@@ -565,12 +559,12 @@ describe('phosphor-properties', () => {
         expect(called).to.be(false);
       });
 
-      it('should not emit the `propertyChanged` signal if the value does not change', () => {
+      it('should not emit the `changedSignal` if the value does not change', () => {
         var called = false;
         var changed = () => { called = true; };
         var p = new Property<Model, number>({ value: 1 });
         var m = new Model();
-        m.propertyChanged.connect(changed);
+        Property.getChanged(m).connect(changed);
         p.coerce(m);
         expect(called).to.be(false);
       });
