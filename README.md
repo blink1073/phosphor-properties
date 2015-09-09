@@ -215,7 +215,7 @@ class MyObject {
 
   static valueProperty = new Property<MyObject, number>({
     value: 42,
-    changed: onValueChanged,
+    changed: (owner, old, value) => owner._onValueChanged(old, value),
   });
 
   get value(): number {
@@ -225,13 +225,10 @@ class MyObject {
   set value(value: number) {
     MyObject.valueProperty.set(this, value);
   }
-}
 
-
-function onValueChanged(owner: MyObject, oldValue: number, newValue: number): void {
-  // Handle the value change. Module-private functions can be considered
-  // "friend" functions of the owner object, and casting it to <any> in
-  // order to call private or protected methods is a valid pattern.
+  private _onValueChanged(oldValue: number, newValue: number): void {
+    // Handle the value change.
+  }
 }
 
 
