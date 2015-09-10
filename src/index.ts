@@ -212,7 +212,7 @@ class Property<T, U> {
     if (this._pid in hash) {
       oldValue = hash[this._pid];
     } else {
-      oldValue = this._createValue(owner);
+      oldValue = hash[this._pid] = this._createValue(owner);
     }
     var newValue = this._coerceValue(owner, value);
     this._maybeNotify(owner, oldValue, hash[this._pid] = newValue);
@@ -236,7 +236,7 @@ class Property<T, U> {
     if (this._pid in hash) {
       oldValue = hash[this._pid];
     } else {
-      oldValue = this._createValue(owner);
+      oldValue = hash[this._pid] = this._createValue(owner);
     }
     var newValue = this._coerceValue(owner, oldValue);
     this._maybeNotify(owner, oldValue, hash[this._pid] = newValue);
