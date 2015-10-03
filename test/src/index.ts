@@ -43,6 +43,32 @@ describe('phosphor-properties', () => {
 
     });
 
+    describe('#metadata', () => {
+
+      it('should default to a new empty object', () => {
+        var p1 = new Property<Model, number>();
+        var p2 = new Property<Model, number>();
+        expect(p1.metadata).to.eql({});
+        expect(p2.metadata).to.eql({});
+        expect(p1.metadata).to.eql(p2.metadata);
+        expect(p1.metadata).to.not.be(p2.metadata);
+      });
+
+      it('should use the metadata provided to the constructor', () => {
+        var m = { one: 1, two: 2 };
+        var p = new Property<Model, number>({
+          metadata: m,
+        });
+        expect(p.metadata).to.be(m);
+      });
+
+      it('should be a read-only property', () => {
+        var p = new Property<Model, number>();
+        expect(() => { p.metadata = {}; }).to.throwException();
+      });
+
+    });
+
     describe('#get()', () => {
 
       it('should return the current value of the property', () => {

@@ -96,6 +96,19 @@ interface IPropertyOptions<T, U> {
    * on the property owner.
    */
   changed?: (owner: T, oldValue: U, newValue: U) => void;
+
+  /**
+   * Optional user-defined metadata for the property.
+   *
+   * #### Notes
+   * The property does not use the metadata for its own purposes. It
+   * exists as convenient storage for supporting external use cases.
+   *
+   * By convention, metadata should be defined as an object literal.
+   *
+   * If not provided, an empty metadata object will be created.
+   */
+  metadata?: any;
 }
 
 
@@ -168,6 +181,17 @@ class Property<T, U> {
     this._coerce = options.coerce;
     this._compare = options.compare;
     this._changed = options.changed;
+    this._metadata = options.metadata || {};
+  }
+
+  /**
+   * Get the metadata for the property.
+   *
+   * #### Notes
+   * This is a read-only property.
+   */
+  get metadata(): any {
+    return this._metadata;
   }
 
   /**
@@ -278,6 +302,7 @@ class Property<T, U> {
   }
 
   private _value: U;
+  private _metadata: any;
   private _pid = nextPID();
   private _create: (owner: T) => U;
   private _coerce: (owner: T, value: U) => U;
