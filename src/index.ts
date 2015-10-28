@@ -206,8 +206,8 @@ class Property<T, U> {
    * computed and assigned as the current value of the property.
    */
   get(owner: T): U {
-    var value: U;
-    var hash = lookupHash(owner);
+    let value: U;
+    let hash = lookupHash(owner);
     if (this._pid in hash) {
       value = hash[this._pid];
     } else {
@@ -231,14 +231,14 @@ class Property<T, U> {
    * computed and used as the previous value for the comparison.
    */
   set(owner: T, value: U): void {
-    var oldValue: U;
-    var hash = lookupHash(owner);
+    let oldValue: U;
+    let hash = lookupHash(owner);
     if (this._pid in hash) {
       oldValue = hash[this._pid];
     } else {
       oldValue = hash[this._pid] = this._createValue(owner);
     }
-    var newValue = this._coerceValue(owner, value);
+    let newValue = this._coerceValue(owner, value);
     this._maybeNotify(owner, oldValue, hash[this._pid] = newValue);
   }
 
@@ -255,14 +255,14 @@ class Property<T, U> {
    * computed and used as the previous value for the comparison.
    */
   coerce(owner: T): void {
-    var oldValue: U;
-    var hash = lookupHash(owner);
+    let oldValue: U;
+    let hash = lookupHash(owner);
     if (this._pid in hash) {
       oldValue = hash[this._pid];
     } else {
       oldValue = hash[this._pid] = this._createValue(owner);
     }
-    var newValue = this._coerceValue(owner, oldValue);
+    let newValue = this._coerceValue(owner, oldValue);
     this._maybeNotify(owner, oldValue, hash[this._pid] = newValue);
   }
 
@@ -270,7 +270,7 @@ class Property<T, U> {
    * Get or create the default value for the given owner.
    */
   private _createValue(owner: T): U {
-    var create = this._create;
+    let create = this._create;
     return create ? create(owner) : this._value;
   }
 
@@ -278,7 +278,7 @@ class Property<T, U> {
    * Coerce the value for the given owner.
    */
   private _coerceValue(owner: T, value: U): U {
-    var coerce = this._coerce;
+    let coerce = this._coerce;
     return coerce ? coerce(owner, value) : value;
   }
 
@@ -286,7 +286,7 @@ class Property<T, U> {
    * Compare the old value and new value for equality.
    */
   private _compareValue(oldValue: U, newValue: U): boolean {
-    var compare = this._compare;
+    let compare = this._compare;
     return compare ? compare(oldValue, newValue) : oldValue === newValue;
   }
 
@@ -358,7 +358,7 @@ function changedArgs(property: Property<any, any>, oldValue: any, newValue: any)
  * This will create the hash if one does not already exist.
  */
 function lookupHash(owner: any): PropertyHash {
-  var hash = ownerData.get(owner);
+  let hash = ownerData.get(owner);
   if (hash !== void 0) return hash;
   hash = Object.create(null);
   ownerData.set(owner, hash);
