@@ -1,6 +1,6 @@
 {
   "name": "phosphor-properties",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "A module for attached property descriptors.",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
