@@ -13,25 +13,34 @@ import {
 
 
 /**
- * The arguments object emitted with a [[changedSignal]].
+ * The arguments object emitted with a changed signal.
  */
 export
-interface IChangedArgs {
+interface IPropertyChangedArgs<T, U> {
   /**
    * The property descriptor associated with the change.
    */
-  property: Property<any, any>;
+  property: Property<T, U>;
 
   /**
    * The old value of the property.
    */
-  oldValue: any;
+  oldValue: U;
 
   /**
    * The new value of the property.
    */
-  newValue: any;
+  newValue: U;
 }
+
+
+/**
+ * This type alias is deprecated.
+ *
+ * New code should use the [[IPropertyChangedArgs]] interface.
+ */
+export
+type IChangedArgs = IPropertyChangedArgs<any, any>;
 
 
 /**
@@ -92,10 +101,23 @@ interface IPropertyOptions<T, U> {
    * #### Notes
    * This will **not** be called for the initial default value.
    *
-   * This will be invoked **before** the [[changedSignal]] is emitted
+   * This will be invoked **before** the changed signals are emitted
    * on the property owner.
    */
   changed?: (owner: T, oldValue: U, newValue: U) => void;
+
+  /**
+   * Whether to emit the changed signals when the property changes.
+   *
+   * If this is `true`, the changed signals **will not** be emitted
+   * when the property value changes. This allows for the creation of
+   * private properties which cannot be observed by external code. It
+   * also provides an optimization point for properties which don't
+   * need to be observed.
+   *
+   * The default value is `false`.
+   */
+  silent?: boolean;
 
   /**
    * Optional user-defined metadata for the property.
@@ -148,25 +170,29 @@ class Property<T, U> {
    * A signal emitted when a property value changes.
    *
    * #### Notes
-   * This is an attached signal which will be emitted using the
-   * owner of the property value as the sender.
+   * This is an attached signal which will be emitted using the owner
+   * of the property value as the sender.
    *
-   * **See also:** [[getChanged]]
+   * **See Also:** [[getChanged]]
    */
-  static changedSignal = new Signal<any, IChangedArgs>();
+  static changedSignal = new Signal<any, IPropertyChangedArgs<any, any>>();
 
   /**
-   * Get a bound [[changedSignal]] for a given property owner.
+   * Get the bound changed signal for a given property owner.
    *
    * @param owner - The object to bind to the changed signal.
    *
    * @returns The bound changed signal for the owner.
    *
    * #### Notes
-   * This signal will be emitted whenever any property value
-   * for the specified owner is changed.
+   * This signal will be emitted whenever **any** property value for
+   * the specified owner is changed.
+   *
+   * This signal is emitted **after** the instance changed signal.
+   *
+   * This signal will not be emmited for properties marked as silent.
    */
-  static getChanged<V>(owner: V): ISignal<V, IChangedArgs> {
+  static getChanged<V>(owner: V): ISignal<V, IPropertyChangedArgs<V, any>> {
     return Property.changedSignal.bind(owner);
   }
 
@@ -181,6 +207,7 @@ class Property<T, U> {
     this._coerce = options.coerce;
     this._compare = options.compare;
     this._changed = options.changed;
+    this._silent = !!options.silent;
     this._metadata = options.metadata || {};
   }
 
@@ -195,6 +222,38 @@ class Property<T, U> {
   }
 
   /**
+   * A signal emitted when the property value changes.
+   *
+   * #### Notes
+   * This is an attached signal which will be emitted using the owner
+   * of the property value as the sender.
+   *
+   * **See Also:** [[getChanged]]
+   */
+  get changedSignal(): Signal<T, IPropertyChangedArgs<T, U>> {
+    return this._changedSignal;
+  }
+
+  /**
+   * Get the bound changed signal for a given property owner.
+   *
+   * @param owner - The object to bind to the changed signal.
+   *
+   * @returns The bound changed signal for the owner.
+   *
+   * #### Notes
+   * This signal will be emitted whenever **this** property value
+   * for the specified owner is changed.
+   *
+   * This signal is emitted **before** the static changed signal.
+   *
+   * This signal will not be emmited for properties marked as silent.
+   */
+  getChanged(owner: T): ISignal<T, IPropertyChangedArgs<T, U>> {
+    return this._changedSignal.bind(owner);
+  }
+
+  /**
    * Get the current value of the property for a given owner.
    *
    * @param owner - The property owner of interest.
@@ -206,8 +265,8 @@ class Property<T, U> {
    * computed and assigned as the current value of the property.
    */
   get(owner: T): U {
-    var value: U;
-    var hash = lookupHash(owner);
+    let value: U;
+    let hash = lookupHash(owner);
     if (this._pid in hash) {
       value = hash[this._pid];
     } else {
@@ -225,20 +284,20 @@ class Property<T, U> {
    *
    * #### Notes
    * If this operation causes the property value to change, the
-   * [[changedSignal]] will be emitted with the owner as sender.
+   * changed signals will be emitted with the owner as sender.
    *
    * If the value has not yet been set, the default value will be
    * computed and used as the previous value for the comparison.
    */
   set(owner: T, value: U): void {
-    var oldValue: U;
-    var hash = lookupHash(owner);
+    let oldValue: U;
+    let hash = lookupHash(owner);
     if (this._pid in hash) {
       oldValue = hash[this._pid];
     } else {
       oldValue = hash[this._pid] = this._createValue(owner);
     }
-    var newValue = this._coerceValue(owner, value);
+    let newValue = this._coerceValue(owner, value);
     this._maybeNotify(owner, oldValue, hash[this._pid] = newValue);
   }
 
@@ -249,20 +308,20 @@ class Property<T, U> {
    *
    * #### Notes
    * If this operation causes the property value to change, the
-   * [[changedSignal]] will be emitted with the owner as sender.
+   * changed signals will be emitted with the owner as sender.
    *
    * If the value has not yet been set, the default value will be
    * computed and used as the previous value for the comparison.
    */
   coerce(owner: T): void {
-    var oldValue: U;
-    var hash = lookupHash(owner);
+    let oldValue: U;
+    let hash = lookupHash(owner);
     if (this._pid in hash) {
       oldValue = hash[this._pid];
     } else {
       oldValue = hash[this._pid] = this._createValue(owner);
     }
-    var newValue = this._coerceValue(owner, oldValue);
+    let newValue = this._coerceValue(owner, oldValue);
     this._maybeNotify(owner, oldValue, hash[this._pid] = newValue);
   }
 
@@ -270,7 +329,7 @@ class Property<T, U> {
    * Get or create the default value for the given owner.
    */
   private _createValue(owner: T): U {
-    var create = this._create;
+    let create = this._create;
     return create ? create(owner) : this._value;
   }
 
@@ -278,7 +337,7 @@ class Property<T, U> {
    * Coerce the value for the given owner.
    */
   private _coerceValue(owner: T, value: U): U {
-    var coerce = this._coerce;
+    let coerce = this._coerce;
     return coerce ? coerce(owner, value) : value;
   }
 
@@ -286,7 +345,7 @@ class Property<T, U> {
    * Compare the old value and new value for equality.
    */
   private _compareValue(oldValue: U, newValue: U): boolean {
-    var compare = this._compare;
+    let compare = this._compare;
     return compare ? compare(oldValue, newValue) : oldValue === newValue;
   }
 
@@ -294,20 +353,30 @@ class Property<T, U> {
    * Run the change notification if the given values are different.
    */
   private _maybeNotify(owner: T, oldValue: U, newValue: U): void {
-    if (!this._compareValue(oldValue, newValue)) {
-      var changed = this._changed;
-      if (changed) changed(owner, oldValue, newValue);
-      Property.getChanged(owner).emit(changedArgs(this, oldValue, newValue));
+    if (this._compareValue(oldValue, newValue)) {
+      return;
     }
+    let changed = this._changed;
+    if (changed) {
+      changed(owner, oldValue, newValue);
+    }
+    if (this._silent) {
+      return;
+    }
+    let args = { property: this, oldValue, newValue };
+    this.getChanged(owner).emit(args);
+    Property.getChanged(owner).emit(args);
   }
 
   private _value: U;
   private _metadata: any;
+  private _silent: boolean;
   private _pid = nextPID();
   private _create: (owner: T) => U;
   private _coerce: (owner: T, value: U) => U;
   private _compare: (oldValue: U, newValue: U) => boolean;
   private _changed: (owner: T, oldValue: U, newValue: U) => void;
+  private _changedSignal = new Signal<T, IPropertyChangedArgs<T, U>>();
 }
 
 
@@ -341,15 +410,7 @@ var ownerData = new WeakMap<any, PropertyHash>();
 /**
  * A function which computes successive unique property ids.
  */
-var nextPID = (() => { var id = 0; return () => 'pid-' + id++; })();
-
-
-/**
- * Create the changed args for the given property and values.
- */
-function changedArgs(property: Property<any, any>, oldValue: any, newValue: any): IChangedArgs {
-  return { property: property, oldValue: oldValue, newValue: newValue };
-}
+var nextPID = (() => { let id = 0; return () => 'pid-' + id++; })();
 
 
 /**
@@ -358,7 +419,7 @@ function changedArgs(property: Property<any, any>, oldValue: any, newValue: any)
  * This will create the hash if one does not already exist.
  */
 function lookupHash(owner: any): PropertyHash {
-  var hash = ownerData.get(owner);
+  let hash = ownerData.get(owner);
   if (hash !== void 0) return hash;
   hash = Object.create(null);
   ownerData.set(owner, hash);
