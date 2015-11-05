@@ -103,7 +103,7 @@ interface IPropertyOptions<T, U> {
    *
    * #### Notes
    * This will be invoked when the property value is changed and the
-   * comparitor indicates that the old value is not equal to the new
+   * comparator indicates that the old value is not equal to the new
    * value.
    *
    * This will **not** be called for the initial default value.
@@ -117,7 +117,7 @@ interface IPropertyOptions<T, U> {
    *
    * #### Notes
    * This will be bound and emitted on behalf of the owner when the
-   * property is changed and the comparitor indicates that the old
+   * property is changed and the comparator indicates that the old
    * value is not equal to the new value.
    *
    * This will **not** be emitted for the initial default value.
