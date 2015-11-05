@@ -213,6 +213,18 @@ class Property<T, U> {
   }
 
   /**
+   * Get the notify signal for the property.
+   *
+   * #### Notes
+   * This will be `undefined` if no notify signal was provided.
+   *
+   * This is a read-only property.
+   */
+  get notify(): Signal<T, IChangedArgs<U>> {
+    return this._notify;
+  }
+
+  /**
    * Get the current value of the property for a given owner.
    *
    * @param owner - The property owner of interest.
