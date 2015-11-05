@@ -27,93 +27,49 @@ describe('phosphor-properties', () => {
 
   describe('Property', () => {
 
-    describe('.changedSignal', () => {
-
-      it('should be a `Signal` instance', () => {
-        expect(Property.changedSignal instanceof Signal).to.be(true);
-      });
-
-    });
-
-    describe('.getChanged', () => {
-
-      it('should get a bound changed signal', () => {
-        var obj = {};
-        var s1 = Property.changedSignal.bind(obj);
-        var s2 = Property.getChanged(obj);
-        expect(s1).to.eql(s2);
-      });
-
-    });
-
     describe('#constructor()', () => {
 
-      it('should accept zero arguments', () => {
-        var p = new Property<Model, number>();
-        expect(p instanceof Property).to.be(true);
-      });
-
       it('should accept a single options argument', () => {
-        var p = new Property<Model, number>({
+        let p = new Property<Model, number>({
+          name: 'p',
           value: 12,
           create: (owner) => 42,
           coerce: (owner, value) => Math.max(0, value),
           compare: (oldValue, newValue) => oldValue === newValue,
           changed: (owner, oldValue, newValue) => { },
+          notify: new Signal<Model, IChangedArgs<number>>(),
         });
         expect(p instanceof Property).to.be(true);
       });
 
     });
 
-    describe('#metadata', () => {
+    describe('#name', () => {
 
-      it('should default to a new empty object', () => {
-        var p1 = new Property<Model, number>();
-        var p2 = new Property<Model, number>();
-        expect(p1.metadata).to.eql({});
-        expect(p2.metadata).to.eql({});
-        expect(p1.metadata).to.eql(p2.metadata);
-        expect(p1.metadata).to.not.be(p2.metadata);
-      });
-
-      it('should use the metadata provided to the constructor', () => {
-        var m = { one: 1, two: 2 };
-        var p = new Property<Model, number>({
-          metadata: m,
-        });
-        expect(p.metadata).to.be(m);
+      it('should be the name provided to the constructor', () => {
+        let p = new Property<Model, number>({ name: 'p' });
+        expect(p.name).to.be('p');
       });
 
       it('should be a read-only property', () => {
-        var p = new Property<Model, number>();
-        expect(() => { p.metadata = {}; }).to.throwException();
+        let p = new Property<Model, number>({ name: 'p' });
+        expect(() => { p.name = 'q'; }).to.throwException();
       });
 
     });
 
-    describe('#changedSignal', () => {
+    describe('#notify', () => {
 
-      it('should be a `Signal` instance', () => {
-        var p = new Property<Model, number>();
-        expect(p.changedSignal instanceof Signal).to.be(true);
+      it('should be the signal provided to the constructor', () => {
+        let notify = new Signal<Model, IChangedArgs<number>>();
+        let p = new Property<Model, number>({ name: 'p', notify });
+        expect(p.notify).to.be(notify);
       });
 
       it('should be a read-only property', () => {
-        var p = new Property<Model, number>();
-        expect(() => { p.changedSignal = null; }).to.throwException();
-      });
-
-    });
-
-    describe('#getChanged', () => {
-
-      it('should get a bound changed signal', () => {
-        var obj = new Model();
-        var p = new Property<Model, number>();
-        var s1 = p.changedSignal.bind(obj);
-        var s2 = p.getChanged(obj);
-        expect(s1).to.eql(s2);
+        let notify = new Signal<Model, IChangedArgs<number>>();
+        let p = new Property<Model, number>({ name: 'p', notify });
+        expect(() => { p.notify = null }).to.throwException();
       });
 
     });
@@ -121,12 +77,12 @@ describe('phosphor-properties', () => {
     describe('#get()', () => {
 
       it('should return the current value of the property', () => {
-        var p1 = new Property<Model, number>();
-        var p2 = new Property<Model, number>();
-        var p3 = new Property<Model, number>();
-        var m1 = new Model();
-        var m2 = new Model();
-        var m3 = new Model();
+        let p1 = new Property<Model, number>({ name: 'p1' });
+        let p2 = new Property<Model, number>({ name: 'p2' });
+        let p3 = new Property<Model, number>({ name: 'p3' });
+        let m1 = new Model();
+        let m2 = new Model();
+        let m3 = new Model();
         expect(p1.get(m1)).to.be(void 0);
         expect(p1.get(m2)).to.be(void 0);
         expect(p1.get(m3)).to.be(void 0);
@@ -157,12 +113,12 @@ describe('phosphor-properties', () => {
       });
 
       it('should return the default value if the value is not yet set', () => {
-        var p1 = new Property<Model, number>({ value: 42 });
-        var p2 = new Property<Model, number>({ value: 43 });
-        var p3 = new Property<Model, number>({ value: 44 });
-        var m1 = new Model();
-        var m2 = new Model();
-        var m3 = new Model();
+        let p1 = new Property<Model, number>({ name: 'p1', value: 42 });
+        let p2 = new Property<Model, number>({ name: 'p2', value: 43 });
+        let p3 = new Property<Model, number>({ name: 'p3', value: 44 });
+        let m1 = new Model();
+        let m2 = new Model();
+        let m3 = new Model();
         expect(p1.get(m1)).to.be(42);
         expect(p2.get(m1)).to.be(43);
         expect(p3.get(m1)).to.be(44);
@@ -175,14 +131,14 @@ describe('phosphor-properties', () => {
       });
 
       it('should use the default factory if the value is not yet set', () => {
-        var tick = 42;
-        var create = () => tick++;
-        var p1 = new Property<Model, number>({ create: create });
-        var p2 = new Property<Model, number>({ create: create });
-        var p3 = new Property<Model, number>({ create: create });
-        var m1 = new Model();
-        var m2 = new Model();
-        var m3 = new Model();
+        let tick = 42;
+        let create = () => tick++;
+        let p1 = new Property<Model, number>({ name: 'p1', create });
+        let p2 = new Property<Model, number>({ name: 'p2', create });
+        let p3 = new Property<Model, number>({ name: 'p3', create });
+        let m1 = new Model();
+        let m2 = new Model();
+        let m3 = new Model();
         expect(p1.get(m1)).to.be(42);
         expect(p2.get(m1)).to.be(43);
         expect(p3.get(m1)).to.be(44);
@@ -195,14 +151,14 @@ describe('phosphor-properties', () => {
       });
 
       it('should prefer the default factory over the default value', () => {
-        var tick = 42;
-        var create = () => tick++;
-        var p1 = new Property<Model, number>({ value: 1, create: create });
-        var p2 = new Property<Model, number>({ value: 1, create: create });
-        var p3 = new Property<Model, number>({ value: 1, create: create });
-        var m1 = new Model();
-        var m2 = new Model();
-        var m3 = new Model();
+        let tick = 42;
+        let create = () => tick++;
+        let p1 = new Property<Model, number>({ name: 'p1', value: 1, create });
+        let p2 = new Property<Model, number>({ name: 'p2', value: 1, create });
+        let p3 = new Property<Model, number>({ name: 'p3', value: 1, create });
+        let m1 = new Model();
+        let m2 = new Model();
+        let m3 = new Model();
         expect(p1.get(m1)).to.be(42);
         expect(p2.get(m1)).to.be(43);
         expect(p3.get(m1)).to.be(44);
@@ -215,14 +171,14 @@ describe('phosphor-properties', () => {
       });
 
       it('should not invoke the coerce function', () => {
-        var called = false;
-        var coerce = (m: Model, v: number) => (called = true,  v);
-        var p1 = new Property<Model, number>({ value: 1, coerce: coerce });
-        var p2 = new Property<Model, number>({ value: 1, coerce: coerce });
-        var p3 = new Property<Model, number>({ value: 1, coerce: coerce });
-        var m1 = new Model();
-        var m2 = new Model();
-        var m3 = new Model();
+        let called = false;
+        let coerce = (m: Model, v: number) => (called = true,  v);
+        let p1 = new Property<Model, number>({ name: 'p1', value: 1, coerce });
+        let p2 = new Property<Model, number>({ name: 'p2', value: 1, coerce });
+        let p3 = new Property<Model, number>({ name: 'p3', value: 1, coerce });
+        let m1 = new Model();
+        let m2 = new Model();
+        let m3 = new Model();
         p1.get(m1);
         p2.get(m1);
         p3.get(m1);
@@ -236,14 +192,14 @@ describe('phosphor-properties', () => {
       });
 
       it('should not invoke the compare function', () => {
-        var called = false;
-        var compare = (v1: number, v2: number) => (called = true,  v1 === v2);
-        var p1 = new Property<Model, number>({ value: 1, compare: compare });
-        var p2 = new Property<Model, number>({ value: 1, compare: compare });
-        var p3 = new Property<Model, number>({ value: 1, compare: compare });
-        var m1 = new Model();
-        var m2 = new Model();
-        var m3 = new Model();
+        let called = false;
+        let compare = (v1: number, v2: number) => (called = true,  v1 === v2);
+        let p1 = new Property<Model, number>({ name: 'p1', value: 1, compare });
+        let p2 = new Property<Model, number>({ name: 'p2', value: 1, compare });
+        let p3 = new Property<Model, number>({ name: 'p3', value: 1, compare });
+        let m1 = new Model();
+        let m2 = new Model();
+        let m3 = new Model();
         p1.get(m1);
         p2.get(m1);
         p3.get(m1);
@@ -257,14 +213,14 @@ describe('phosphor-properties', () => {
       });
 
       it('should not invoke the changed function', () => {
-        var called = false;
-        var changed = () => { called = true; };
-        var p1 = new Property<Model, number>({ value: 1, changed: changed });
-        var p2 = new Property<Model, number>({ value: 1, changed: changed });
-        var p3 = new Property<Model, number>({ value: 1, changed: changed });
-        var m1 = new Model();
-        var m2 = new Model();
-        var m3 = new Model();
+        let called = false;
+        let changed = () => { called = true; };
+        let p1 = new Property<Model, number>({ name: 'p1', value: 1, changed });
+        let p2 = new Property<Model, number>({ name: 'p2', value: 1, changed });
+        let p3 = new Property<Model, number>({ name: 'p3', value: 1, changed });
+        let m1 = new Model();
+        let m2 = new Model();
+        let m3 = new Model();
         p1.get(m1);
         p2.get(m1);
         p3.get(m1);
@@ -277,18 +233,19 @@ describe('phosphor-properties', () => {
         expect(called).to.be(false);
       });
 
-      it('should not emit the static `changedSignal`', () => {
-        var called = false;
-        var changed = () => { called = true; };
-        var p1 = new Property<Model, number>({ value: 1 });
-        var p2 = new Property<Model, number>({ value: 1 });
-        var p3 = new Property<Model, number>({ value: 1 });
-        var m1 = new Model();
-        var m2 = new Model();
-        var m3 = new Model();
-        Property.getChanged(m1).connect(changed);
-        Property.getChanged(m2).connect(changed);
-        Property.getChanged(m3).connect(changed);
+      it('should not emit the notify signal', () => {
+        let called = false;
+        let changed = () => { called = true; };
+        let notify = new Signal<Model, IChangedArgs<number>>();
+        let p1 = new Property<Model, number>({ name: 'p1', value: 1, notify });
+        let p2 = new Property<Model, number>({ name: 'p1', value: 1, notify });
+        let p3 = new Property<Model, number>({ name: 'p1', value: 1, notify });
+        let m1 = new Model();
+        let m2 = new Model();
+        let m3 = new Model();
+        notify.bind(m1).connect(changed);
+        notify.bind(m2).connect(changed);
+        notify.bind(m3).connect(changed);
         p1.get(m1);
         p2.get(m1);
         p3.get(m1);
@@ -298,22 +255,6 @@ describe('phosphor-properties', () => {
         p1.get(m3);
         p2.get(m3);
         p3.get(m3);
-        expect(called).to.be(false);
-      });
-
-      it('should not emit the instance `changedSignal`', () => {
-        var called = false;
-        var changed = () => { called = true; };
-        var p1 = new Property<Model, number>({ value: 1 });
-        var p2 = new Property<Model, number>({ value: 1 });
-        var p3 = new Property<Model, number>({ value: 1 });
-        var m1 = new Model();
-        p1.getChanged(m1).connect(changed);
-        p2.getChanged(m1).connect(changed);
-        p3.getChanged(m1).connect(changed);
-        p1.get(m1);
-        p2.get(m1);
-        p3.get(m1);
         expect(called).to.be(false);
       });
 
@@ -322,12 +263,12 @@ describe('phosphor-properties', () => {
     describe('#set()', () => {
 
       it('should set the current value of the property', () => {
-        var p1 = new Property<Model, number>();
-        var p2 = new Property<Model, number>();
-        var p3 = new Property<Model, number>();
-        var m1 = new Model();
-        var m2 = new Model();
-        var m3 = new Model();
+        let p1 = new Property<Model, number>({ name: 'p1' });
+        let p2 = new Property<Model, number>({ name: 'p2' });
+        let p3 = new Property<Model, number>({ name: 'p3' });
+        let m1 = new Model();
+        let m2 = new Model();
+        let m3 = new Model();
         p1.set(m1, 1);
         p1.set(m2, 2);
         p1.set(m3, 3);
@@ -349,20 +290,20 @@ describe('phosphor-properties', () => {
       });
 
       it('should invoke the changed function if the value changes', () => {
-        var models: Model[] = [];
-        var oldvals: number[] = [];
-        var newvals: number[] = [];
-        var changed = (m: Model, o: number, n: number) => {
+        let models: Model[] = [];
+        let oldvals: number[] = [];
+        let newvals: number[] = [];
+        let changed = (m: Model, o: number, n: number) => {
           models.push(m);
           oldvals.push(o);
           newvals.push(n);
         };
-        var p1 = new Property<Model, number>({ value: 0, changed: changed });
-        var p2 = new Property<Model, number>({ value: 0, changed: changed });
-        var p3 = new Property<Model, number>({ value: 0, changed: changed });
-        var m1 = new Model();
-        var m2 = new Model();
-        var m3 = new Model();
+        let p1 = new Property<Model, number>({ name: 'p1', value: 0, changed });
+        let p2 = new Property<Model, number>({ name: 'p2', value: 0, changed });
+        let p3 = new Property<Model, number>({ name: 'p3', value: 0, changed });
+        let m1 = new Model();
+        let m2 = new Model();
+        let m3 = new Model();
         p1.set(m1, 1);
         p1.set(m2, 2);
         p1.set(m3, 3);
@@ -377,24 +318,27 @@ describe('phosphor-properties', () => {
         expect(newvals).to.eql([1, 2, 3, 4, 5, 6, 7, 8, 9]);
       });
 
-      it('should emit the static `changedSignal` if the value changes', () => {
-        var models: Model[] = [];
-        var oldvals: number[] = [];
-        var newvals: number[] = [];
-        var changed = (sender: Model, args: IChangedArgs) => {
+      it('should emit the notify signal if the value changes', () => {
+        let models: Model[] = [];
+        let names: string[] = [];
+        let oldvals: number[] = [];
+        let newvals: number[] = [];
+        let notify = new Signal<Model, IChangedArgs<number>>();
+        let changed = (sender: Model, args: IChangedArgs<number>) => {
           models.push(sender);
+          names.push(args.name);
           oldvals.push(args.oldValue);
           newvals.push(args.newValue);
         };
-        var p1 = new Property<Model, number>({ value: 0 });
-        var p2 = new Property<Model, number>({ value: 0 });
-        var p3 = new Property<Model, number>({ value: 0 });
-        var m1 = new Model();
-        var m2 = new Model();
-        var m3 = new Model();
-        Property.getChanged(m1).connect(changed);
-        Property.getChanged(m2).connect(changed);
-        Property.getChanged(m3).connect(changed);
+        let p1 = new Property<Model, number>({ name: 'p1', value: 0, notify });
+        let p2 = new Property<Model, number>({ name: 'p2', value: 1, notify });
+        let p3 = new Property<Model, number>({ name: 'p3', value: 2, notify });
+        let m1 = new Model();
+        let m2 = new Model();
+        let m3 = new Model();
+        notify.bind(m1).connect(changed);
+        notify.bind(m2).connect(changed);
+        notify.bind(m3).connect(changed);
         p1.set(m1, 1);
         p1.set(m2, 2);
         p1.set(m3, 3);
@@ -405,72 +349,40 @@ describe('phosphor-properties', () => {
         p3.set(m2, 8);
         p3.set(m3, 9);
         expect(models).to.eql([m1, m2, m3, m1, m2, m3, m1, m2, m3]);
-        expect(oldvals).to.eql([0, 0, 0, 0, 0, 0, 0, 0, 0]);
+        expect(names).to.eql(['p1', 'p1', 'p1', 'p2', 'p2', 'p2', 'p3', 'p3', 'p3']);
+        expect(oldvals).to.eql([0, 0, 0, 1, 1, 1, 2, 2, 2]);
         expect(newvals).to.eql([1, 2, 3, 4, 5, 6, 7, 8, 9]);
       });
 
-      it('should emit the instance `changedSignal` if the value changes', () => {
-        var models: Model[] = [];
-        var oldvals: number[] = [];
-        var newvals: number[] = [];
-        var changed = (sender: Model, args: IChangedArgs) => {
-          models.push(sender);
-          oldvals.push(args.oldValue);
-          newvals.push(args.newValue);
-        };
-        var p1 = new Property<Model, number>({ value: 0 });
-        var p2 = new Property<Model, number>({ value: 0 });
-        var p3 = new Property<Model, number>({ value: 0 });
-        var m1 = new Model();
-        var m2 = new Model();
-        var m3 = new Model();
-        p1.getChanged(m1).connect(changed);
-        p2.getChanged(m2).connect(changed);
-        p3.getChanged(m3).connect(changed);
-        p1.set(m1, 1);
-        p1.set(m2, 2);
-        p1.set(m3, 3);
-        p2.set(m1, 4);
-        p2.set(m2, 5);
-        p2.set(m3, 6);
-        p3.set(m1, 7);
-        p3.set(m2, 8);
-        p3.set(m3, 9);
-        expect(models).to.eql([m1, m2, m3]);
-        expect(oldvals).to.eql([0, 0, 0]);
-        expect(newvals).to.eql([1, 5, 9]);
-      });
-
-      it('should notify in order: function -> instance -> static', () => {
-        var result: string[] = [];
-        var changed1 = () => { result.push('c1'); };
-        var changed2 = () => { result.push('c2'); };
-        var changed3 = () => { result.push('c3'); };
-        var p = new Property<Model, number>({ value: 0, changed: changed1 });
-        var m = new Model();
-        Property.getChanged(m).connect(changed3);
-        p.getChanged(m).connect(changed2);
+      it('should call the changed function before notify signal', () => {
+        let result: string[] = [];
+        let changed = () => { result.push('c1'); };
+        let changed2 = () => { result.push('c2'); };
+        let notify = new Signal<Model, IChangedArgs<number>>();
+        let p = new Property<Model, number>({ name: 'p', value: 0, changed, notify });
+        let m = new Model();
+        notify.bind(m).connect(changed2);
         p.set(m, 42);
-        expect(result).to.eql(['c1', 'c2', 'c3']);
+        expect(result).to.eql(['c1', 'c2']);
       });
 
       it('should use the default factory for old value if value is not yet set', () => {
-        var models: Model[] = [];
-        var oldvals: number[] = [];
-        var newvals: number[] = [];
-        var changed = (m: Model, o: number, n: number) => {
+        let models: Model[] = [];
+        let oldvals: number[] = [];
+        let newvals: number[] = [];
+        let changed = (m: Model, o: number, n: number) => {
           models.push(m);
           oldvals.push(o);
           newvals.push(n);
         };
-        var tick = 42;
-        var create = () => tick++;
-        var p1 = new Property<Model, number>({ create: create, changed: changed });
-        var p2 = new Property<Model, number>({ create: create, changed: changed });
-        var p3 = new Property<Model, number>({ create: create, changed: changed });
-        var m1 = new Model();
-        var m2 = new Model();
-        var m3 = new Model();
+        let tick = 42;
+        let create = () => tick++;
+        let p1 = new Property<Model, number>({ name: 'p1', create, changed });
+        let p2 = new Property<Model, number>({ name: 'p2', create, changed });
+        let p3 = new Property<Model, number>({ name: 'p3', create, changed });
+        let m1 = new Model();
+        let m2 = new Model();
+        let m3 = new Model();
         p1.set(m1, 1);
         p1.set(m2, 2);
         p1.set(m3, 3);
@@ -486,22 +398,22 @@ describe('phosphor-properties', () => {
       });
 
       it('should prefer the default factory over default value', () => {
-        var models: Model[] = [];
-        var oldvals: number[] = [];
-        var newvals: number[] = [];
-        var changed = (m: Model, o: number, n: number) => {
+        let models: Model[] = [];
+        let oldvals: number[] = [];
+        let newvals: number[] = [];
+        let changed = (m: Model, o: number, n: number) => {
           models.push(m);
           oldvals.push(o);
           newvals.push(n);
         };
-        var tick = 42;
-        var create = () => tick++;
-        var p1 = new Property<Model, number>({ value: 0, create: create, changed: changed });
-        var p2 = new Property<Model, number>({ value: 0, create: create, changed: changed });
-        var p3 = new Property<Model, number>({ value: 0, create: create, changed: changed });
-        var m1 = new Model();
-        var m2 = new Model();
-        var m3 = new Model();
+        let tick = 42;
+        let create = () => tick++;
+        let p1 = new Property<Model, number>({ name: 'p1', value: 0, create, changed });
+        let p2 = new Property<Model, number>({ name: 'p2', value: 0, create, changed });
+        let p3 = new Property<Model, number>({ name: 'p3', value: 0, create, changed });
+        let m1 = new Model();
+        let m2 = new Model();
+        let m3 = new Model();
         p1.set(m1, 1);
         p1.set(m2, 2);
         p1.set(m3, 3);
@@ -517,9 +429,9 @@ describe('phosphor-properties', () => {
       });
 
       it('should invoke the coerce function on the new value', () => {
-        var coerce = (o: Model, v: number) => Math.max(0, v);
-        var p = new Property<Model, number>({ coerce: coerce });
-        var m = new Model();
+        let coerce = (o: Model, v: number) => Math.max(0, v);
+        let p = new Property<Model, number>({ name: 'p', coerce });
+        let m = new Model();
         p.set(m, -10);
         expect(p.get(m)).to.be(0);
         p.set(m, 10);
@@ -532,22 +444,53 @@ describe('phosphor-properties', () => {
         expect(p.get(m)).to.be(0);
       });
 
-      it('should invoke the compare function to compare values', () => {
-        var called = false;
-        var compare = (v1: number, v2: number) => (called = true,  v1 === v2);
-        var p = new Property<Model, number>({ value: 1, compare: compare });
-        var m = new Model();
+      it('should not invoke the compare function if there are no listeners', () => {
+        let called = false;
+        let compare = (v1: number, v2: number) => (called = true, v1 === v2);
+        let p = new Property<Model, number>({ name: 'p', value: 1, compare });
+        let m = new Model();
+        p.set(m, 42);
+        expect(called).to.be(false);
+      });
+
+      it('should invoke the compare function if there is a changed function', () => {
+        let called = false;
+        let changed = () => { };
+        let compare = (v1: number, v2: number) => (called = true, v1 === v2);
+        let p = new Property<Model, number>({ name: 'p', value: 1, compare, changed });
+        let m = new Model();
+        p.set(m, 42);
+        expect(called).to.be(true);
+      });
+
+      it('should invoke the compare function if there is a notify signal', () => {
+        let called = false;
+        let notify = new Signal<Model, IChangedArgs<number>>();
+        let compare = (v1: number, v2: number) => (called = true, v1 === v2);
+        let p = new Property<Model, number>({ name: 'p', value: 1, compare, notify });
+        let m = new Model();
+        p.set(m, 42);
+        expect(called).to.be(true);
+      });
+
+      it('should invoke the compare function if there is a changed function and notify signal', () => {
+        let called = false;
+        let changed = () => { };
+        let notify = new Signal<Model, IChangedArgs<number>>();
+        let compare = (v1: number, v2: number) => (called = true, v1 === v2);
+        let p = new Property<Model, number>({ name: 'p', value: 1, compare, changed, notify });
+        let m = new Model();
         p.set(m, 42);
         expect(called).to.be(true);
       });
 
       it('should not invoke the changed function if the value does not change', () => {
-        var called = false;
-        var changed = () => { called = true; };
-        var compare = (v1: number, v2: number) => true;
-        var p1 = new Property<Model, number>({ value: 1, changed: changed });
-        var p2 = new Property<Model, number>({ value: 1, compare: compare, changed: changed });
-        var m = new Model();
+        let called = false;
+        let changed = () => { called = true; };
+        let compare = (v1: number, v2: number) => true;
+        let p1 = new Property<Model, number>({ name: 'p1', value: 1, changed });
+        let p2 = new Property<Model, number>({ name: 'p2', value: 1, compare, changed });
+        let m = new Model();
         p1.set(m, 1);
         p1.set(m, 1);
         p2.set(m, 1);
@@ -557,32 +500,15 @@ describe('phosphor-properties', () => {
         expect(called).to.be(false);
       });
 
-      it('should not emit the static `changedSignal` if the value does not change', () => {
-        var called = false;
-        var changed = () => { called = true; };
-        var compare = (v1: number, v2: number) => true;
-        var p1 = new Property<Model, number>({ value: 1 });
-        var p2 = new Property<Model, number>({ value: 1, compare: compare });
-        var m = new Model();
-        Property.getChanged(m).connect(changed);
-        p1.set(m, 1);
-        p1.set(m, 1);
-        p2.set(m, 1);
-        p2.set(m, 2);
-        p2.set(m, 3);
-        p2.set(m, 4);
-        expect(called).to.be(false);
-      });
-
-      it('should not emit the instance `changedSignal` if the value does not change', () => {
-        var called = false;
-        var changed = () => { called = true; };
-        var compare = (v1: number, v2: number) => true;
-        var p1 = new Property<Model, number>({ value: 1 });
-        var p2 = new Property<Model, number>({ value: 1, compare: compare });
-        var m = new Model();
-        p1.getChanged(m).connect(changed);
-        p2.getChanged(m).connect(changed);
+      it('should not emit the notify signal if the value does not change', () => {
+        let called = false;
+        let changed = () => { called = true; };
+        let compare = (v1: number, v2: number) => true;
+        let notify = new Signal<Model, IChangedArgs<number>>();
+        let p1 = new Property<Model, number>({ name: 'p1', value: 1, notify });
+        let p2 = new Property<Model, number>({ name: 'p2', value: 1, compare, notify });
+        let m = new Model();
+        notify.bind(m).connect(changed);
         p1.set(m, 1);
         p1.set(m, 1);
         p2.set(m, 1);
@@ -597,11 +523,11 @@ describe('phosphor-properties', () => {
     describe('#coerce()', () => {
 
       it('should coerce the current value of the property', () => {
-        var min = 20;
-        var max = 50;
-        var coerce = (m: Model, v: number) => Math.max(min, Math.min(v, max));
-        var p = new Property<Model, number>({ value: 0, coerce: coerce });
-        var m = new Model();
+        let min = 20;
+        let max = 50;
+        let coerce = (m: Model, v: number) => Math.max(min, Math.min(v, max));
+        let p = new Property<Model, number>({ name: 'p', value: 0, coerce });
+        let m = new Model();
         p.set(m, 10);
         expect(p.get(m)).to.be(20);
         min = 30;
@@ -614,157 +540,135 @@ describe('phosphor-properties', () => {
       });
 
       it('should invoke the changed function if the value changes', () => {
-        var called = false;
-        var coerce = (m: Model, v: number) => Math.max(20, v);
-        var changed = () => { called = true };
-        var p = new Property<Model, number>({ value: 0, coerce: coerce, changed: changed });
-        var m = new Model();
+        let called = false;
+        let coerce = (m: Model, v: number) => Math.max(20, v);
+        let changed = () => { called = true };
+        let p = new Property<Model, number>({ name: 'p', value: 0, coerce, changed });
+        let m = new Model();
         p.coerce(m);
         expect(called).to.be(true);
       });
 
-      it('should emit the static `changedSignal` if the value changes', () => {
-        var called = false;
-        var coerce = (m: Model, v: number) => Math.max(20, v);
-        var changed = () => { called = true };
-        var p = new Property<Model, number>({ value: 0, coerce: coerce });
-        var m = new Model();
-        Property.getChanged(m).connect(changed);
+      it('should emit the notify signal if the value changes', () => {
+        let called = false;
+        let coerce = (m: Model, v: number) => Math.max(20, v);
+        let changed = () => { called = true };
+        let notify = new Signal<Model, IChangedArgs<number>>();
+        let p = new Property<Model, number>({ name: 'p', value: 0, coerce, notify });
+        let m = new Model();
+        notify.bind(m).connect(changed);
         p.coerce(m);
         expect(called).to.be(true);
       });
 
-      it('should emit the instance `changedSignal` if the value changes', () => {
-        var called = false;
-        var coerce = (m: Model, v: number) => Math.max(20, v);
-        var changed = () => { called = true };
-        var p = new Property<Model, number>({ value: 0, coerce: coerce });
-        var m = new Model();
-        p.getChanged(m).connect(changed);
+      it('should call the changed function before notify signal', () => {
+        let result: string[] = [];
+        let changed = () => { result.push('c1'); };
+        let changed2 = () => { result.push('c2'); };
+        let coerce = (m: Model, v: number) => Math.max(20, v);
+        let notify = new Signal<Model, IChangedArgs<number>>();
+        let p = new Property<Model, number>({ name: 'p', value: 0, coerce, changed, notify });
+        let m = new Model();
+        notify.bind(m).connect(changed2);
         p.coerce(m);
-        expect(called).to.be(true);
-      });
-
-      it('should notify in order: function -> instance -> static', () => {
-        var result: string[] = [];
-        var changed1 = () => { result.push('c1'); };
-        var changed2 = () => { result.push('c2'); };
-        var changed3 = () => { result.push('c3'); };
-        var coerce = (m: Model, v: number) => Math.max(20, v);
-        var p = new Property<Model, number>({ value: 0, coerce: coerce, changed: changed1 });
-        var m = new Model();
-        p.getChanged(m).connect(changed2);
-        Property.getChanged(m).connect(changed3);
-        p.coerce(m);
-        expect(result).to.eql(['c1', 'c2', 'c3']);
+        expect(result).to.eql(['c1', 'c2']);
       });
 
       it('should use the default value as old value if value is not yet set', () => {
-        var oldval: number;
-        var newval: number;
-        var coerce = (m: Model, v: number) => Math.max(20, v);
-        var changed = (m: Model, o: number, n: number) => { oldval = o; newval = n; };
-        var p = new Property<Model, number>({ value: 0, coerce: coerce, changed: changed });
-        var m = new Model();
+        let oldval: number;
+        let newval: number;
+        let coerce = (m: Model, v: number) => Math.max(20, v);
+        let changed = (m: Model, o: number, n: number) => { oldval = o; newval = n; };
+        let p = new Property<Model, number>({ name: 'p', value: 0, coerce, changed });
+        let m = new Model();
         p.coerce(m);
         expect(oldval).to.be(0);
         expect(newval).to.be(20);
       });
 
       it('should use the default factory for old value if value is not yet set', () => {
-        var oldval: number;
-        var newval: number;
-        var create = () => 12;
-        var coerce = (m: Model, v: number) => Math.max(20, v);
-        var changed = (m: Model, o: number, n: number) => { oldval = o; newval = n; };
-        var p = new Property<Model, number>({ create: create, coerce: coerce, changed: changed });
-        var m = new Model();
+        let oldval: number;
+        let newval: number;
+        let create = () => 12;
+        let coerce = (m: Model, v: number) => Math.max(20, v);
+        let changed = (m: Model, o: number, n: number) => { oldval = o; newval = n; };
+        let p = new Property<Model, number>({ name: 'p', create, coerce, changed });
+        let m = new Model();
         p.coerce(m);
         expect(oldval).to.be(12);
         expect(newval).to.be(20);
       });
 
       it('should prefer the default factory over default value', () => {
-        var oldval: number;
-        var newval: number;
-        var create = () => 12;
-        var coerce = (m: Model, v: number) => Math.max(20, v);
-        var changed = (m: Model, o: number, n: number) => { oldval = o; newval = n; };
-        var p = new Property<Model, number>({ value: 0, create: create, coerce: coerce, changed: changed });
-        var m = new Model();
+        let oldval: number;
+        let newval: number;
+        let create = () => 12;
+        let coerce = (m: Model, v: number) => Math.max(20, v);
+        let changed = (m: Model, o: number, n: number) => { oldval = o; newval = n; };
+        let p = new Property<Model, number>({ name: 'p', value: 0, create, coerce, changed });
+        let m = new Model();
         p.coerce(m);
         expect(oldval).to.be(12);
         expect(newval).to.be(20);
       });
 
-      it('should invoke the compare function to compare values', () => {
-        var called = false;
-        var compare = (v1: number, v2: number) => (called = true,  v1 === v2);
-        var p = new Property<Model, number>({ value: 1, compare: compare });
-        var m = new Model();
+      it('should not invoke the compare function if there are not listeners', () => {
+        let called = false;
+        let compare = (v1: number, v2: number) => (called = true,  v1 === v2);
+        let p = new Property<Model, number>({ name: 'p', value: 1, compare });
+        let m = new Model();
+        p.coerce(m);
+        expect(called).to.be(false);
+      });
+
+      it('should invoke the compare function if there is a changed function', () => {
+        let called = false;
+        let changed = () => { };
+        let compare = (v1: number, v2: number) => (called = true, v1 === v2);
+        let p = new Property<Model, number>({ name: 'p', value: 1, compare, changed });
+        let m = new Model();
+        p.coerce(m);
+        expect(called).to.be(true);
+      });
+
+      it('should invoke the compare function if there is a notify signal', () => {
+        let called = false;
+        let notify = new Signal<Model, IChangedArgs<number>>();
+        let compare = (v1: number, v2: number) => (called = true, v1 === v2);
+        let p = new Property<Model, number>({ name: 'p', value: 1, compare, notify });
+        let m = new Model();
+        p.coerce(m);
+        expect(called).to.be(true);
+      });
+
+      it('should invoke the compare function if there is a changed function and notify signal', () => {
+        let called = false;
+        let changed = () => { };
+        let notify = new Signal<Model, IChangedArgs<number>>();
+        let compare = (v1: number, v2: number) => (called = true, v1 === v2);
+        let p = new Property<Model, number>({ name: 'p', value: 1, compare, changed, notify });
+        let m = new Model();
         p.coerce(m);
         expect(called).to.be(true);
       });
 
       it('should not invoke the changed function if the value does not change', () => {
-        var called = false;
-        var changed = () => { called = true; };
-        var p = new Property<Model, number>({ value: 1, changed: changed });
-        var m = new Model();
+        let called = false;
+        let changed = () => { called = true; };
+        let p = new Property<Model, number>({ name: 'p', value: 1, changed });
+        let m = new Model();
         p.coerce(m);
         expect(called).to.be(false);
       });
 
-      it('should not emit the static `changedSignal` if the value does not change', () => {
-        var called = false;
-        var changed = () => { called = true; };
-        var p = new Property<Model, number>({ value: 1 });
-        var m = new Model();
-        Property.getChanged(m).connect(changed);
+      it('should not emit the notify signal if the value does not change', () => {
+        let called = false;
+        let changed = () => { called = true; };
+        let notify = new Signal<Model, IChangedArgs<number>>();
+        let p = new Property<Model, number>({ name: 'p', value: 1, notify });
+        let m = new Model();
+        notify.bind(m).connect(changed);
         p.coerce(m);
-        expect(called).to.be(false);
-      });
-
-      it('should not emit the instance `changedSignal` if the value does not change', () => {
-        var called = false;
-        var changed = () => { called = true; };
-        var p = new Property<Model, number>({ value: 1 });
-        var m = new Model();
-        p.getChanged(m).connect(changed);
-        p.coerce(m);
-        expect(called).to.be(false);
-      });
-
-    });
-
-    context('silent', () => {
-
-      it('should still invoke the static changed function', () => {
-        var called = false;
-        var changed = () => { called = true; };
-        var p = new Property<Model, number>({ silent: true, changed: changed });
-        var m = new Model();
-        p.set(m, 42);
-        expect(called).to.be(true);
-      });
-
-      it('should not invoke the static `changedSignal`', () => {
-        var called = false;
-        var changed = () => { called = true; };
-        var p = new Property<Model, number>({ silent: true });
-        var m = new Model();
-        Property.getChanged(m).connect(changed);
-        p.set(m, 42);
-        expect(called).to.be(false);
-      });
-
-      it('should not invoke the instance `changedSignal`', () => {
-        var called = false;
-        var changed = () => { called = true; };
-        var p = new Property<Model, number>({ silent: true });
-        var m = new Model();
-        p.getChanged(m).connect(changed);
-        p.set(m, 42);
         expect(called).to.be(false);
       });
 
@@ -775,60 +679,60 @@ describe('phosphor-properties', () => {
   describe('clearPropertyData()', () => {
 
     it('should clear all property data for a property owner', () => {
-        var p1 = new Property<Model, number>({ value: 42 });
-        var p2 = new Property<Model, number>({ value: 42 });
-        var p3 = new Property<Model, number>({ value: 42 });
-        var m1 = new Model();
-        var m2 = new Model();
-        var m3 = new Model();
-        p1.set(m1, 1);
-        p1.set(m2, 2);
-        p1.set(m3, 3);
-        p2.set(m1, 4);
-        p2.set(m2, 5);
-        p2.set(m3, 6);
-        p3.set(m1, 7);
-        p3.set(m2, 8);
-        p3.set(m3, 9);
-        expect(p1.get(m1)).to.be(1);
-        expect(p1.get(m2)).to.be(2);
-        expect(p1.get(m3)).to.be(3);
-        expect(p2.get(m1)).to.be(4);
-        expect(p2.get(m2)).to.be(5);
-        expect(p2.get(m3)).to.be(6);
-        expect(p3.get(m1)).to.be(7);
-        expect(p3.get(m2)).to.be(8);
-        expect(p3.get(m3)).to.be(9);
-        clearPropertyData(m1);
-        expect(p1.get(m1)).to.be(42);
-        expect(p1.get(m2)).to.be(2);
-        expect(p1.get(m3)).to.be(3);
-        expect(p2.get(m1)).to.be(42);
-        expect(p2.get(m2)).to.be(5);
-        expect(p2.get(m3)).to.be(6);
-        expect(p3.get(m1)).to.be(42);
-        expect(p3.get(m2)).to.be(8);
-        expect(p3.get(m3)).to.be(9);
-        clearPropertyData(m2);
-        expect(p1.get(m1)).to.be(42);
-        expect(p1.get(m2)).to.be(42);
-        expect(p1.get(m3)).to.be(3);
-        expect(p2.get(m1)).to.be(42);
-        expect(p2.get(m2)).to.be(42);
-        expect(p2.get(m3)).to.be(6);
-        expect(p3.get(m1)).to.be(42);
-        expect(p3.get(m2)).to.be(42);
-        expect(p3.get(m3)).to.be(9);
-        clearPropertyData(m3);
-        expect(p1.get(m1)).to.be(42);
-        expect(p1.get(m2)).to.be(42);
-        expect(p1.get(m3)).to.be(42);
-        expect(p2.get(m1)).to.be(42);
-        expect(p2.get(m2)).to.be(42);
-        expect(p2.get(m3)).to.be(42);
-        expect(p3.get(m1)).to.be(42);
-        expect(p3.get(m2)).to.be(42);
-        expect(p3.get(m3)).to.be(42);
+      let p1 = new Property<Model, number>({ name: 'p1', value: 42 });
+      let p2 = new Property<Model, number>({ name: 'p2', value: 42 });
+      let p3 = new Property<Model, number>({ name: 'p3', value: 42 });
+      let m1 = new Model();
+      let m2 = new Model();
+      let m3 = new Model();
+      p1.set(m1, 1);
+      p1.set(m2, 2);
+      p1.set(m3, 3);
+      p2.set(m1, 4);
+      p2.set(m2, 5);
+      p2.set(m3, 6);
+      p3.set(m1, 7);
+      p3.set(m2, 8);
+      p3.set(m3, 9);
+      expect(p1.get(m1)).to.be(1);
+      expect(p1.get(m2)).to.be(2);
+      expect(p1.get(m3)).to.be(3);
+      expect(p2.get(m1)).to.be(4);
+      expect(p2.get(m2)).to.be(5);
+      expect(p2.get(m3)).to.be(6);
+      expect(p3.get(m1)).to.be(7);
+      expect(p3.get(m2)).to.be(8);
+      expect(p3.get(m3)).to.be(9);
+      clearPropertyData(m1);
+      expect(p1.get(m1)).to.be(42);
+      expect(p1.get(m2)).to.be(2);
+      expect(p1.get(m3)).to.be(3);
+      expect(p2.get(m1)).to.be(42);
+      expect(p2.get(m2)).to.be(5);
+      expect(p2.get(m3)).to.be(6);
+      expect(p3.get(m1)).to.be(42);
+      expect(p3.get(m2)).to.be(8);
+      expect(p3.get(m3)).to.be(9);
+      clearPropertyData(m2);
+      expect(p1.get(m1)).to.be(42);
+      expect(p1.get(m2)).to.be(42);
+      expect(p1.get(m3)).to.be(3);
+      expect(p2.get(m1)).to.be(42);
+      expect(p2.get(m2)).to.be(42);
+      expect(p2.get(m3)).to.be(6);
+      expect(p3.get(m1)).to.be(42);
+      expect(p3.get(m2)).to.be(42);
+      expect(p3.get(m3)).to.be(9);
+      clearPropertyData(m3);
+      expect(p1.get(m1)).to.be(42);
+      expect(p1.get(m2)).to.be(42);
+      expect(p1.get(m3)).to.be(42);
+      expect(p2.get(m1)).to.be(42);
+      expect(p2.get(m2)).to.be(42);
+      expect(p2.get(m3)).to.be(42);
+      expect(p3.get(m1)).to.be(42);
+      expect(p3.get(m2)).to.be(42);
+      expect(p3.get(m3)).to.be(42);
     });
 
   });
