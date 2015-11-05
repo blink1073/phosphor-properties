@@ -145,11 +145,12 @@ When defining a property for use by instances of a **different** class:
     the property API directly. This is why the methods must be
     pure delegates as described above.
 
-This pattern is commonly referred to as an *attached property*. The behavior
-and semantics of the property are defined by one class, but the property value
-belongs to a foreign instance. This pattern is useful when creating container
-objects which must associate container data with child objects in a way which
-doesn't require polluting the child class with extraneous data members.
+A property declared for instances of a different class is referred to as
+an *attached property*. The behavior and semantics of the property are
+defined by one class, but the property value belongs to a foreign instance.
+This pattern is useful when creating container objects which must associate
+container data with child objects in a way which doesn't require polluting
+the child class with extraneous data members.
 
 **Basic Value:**
 
