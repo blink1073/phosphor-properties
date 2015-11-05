@@ -8,6 +8,26 @@ A module for attached property descriptors.
 
 [API Docs](http://phosphorjs.github.io/phosphor-properties/api/)
 
+Phosphor property descriptors encapsulate the following behaviors:
+
+  - **Creation** - A property value can default to a static scalar
+    value or be lazily created by calling a value factory function.
+
+  - **Coercion** - A property can coerce a user-provided value to a
+    value which is guaranteed to be correct based on current state.
+
+  - **Notification** - User code can be notified when the property
+    value changes. The definition of equality can be customized.
+
+  - **Attachement** - A property can be defined for *any* object,
+    not just for instances of the defining class. This allows extra
+    state and behavior to be "attached" to arbitrary objects by
+    external consumers of those objects.
+
+These behavioral patterns are extremely useful for managing complexity in
+large applications. However, they are tedious and repetive to implement
+manually. Phopshor properties reduce developer burden by providing these
+behaviors in an efficient, encapsulated, and type-safe form.
 
 Package Install
 ---------------
