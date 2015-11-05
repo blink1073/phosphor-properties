@@ -121,35 +121,6 @@ When defining a property for use by instances of the **same** class:
     the property API directly. This is why the getter/setter must
     be a pure delegate as described above.
 
-```typescript
-class MyObject {
-
-  static valueProperty = new Property<MyObject, number>({
-    name: 'value',
-    value: 42,
-    changed: (owner, old, value) => owner._onValueChanged(old, value),
-  });
-
-  get value(): number {
-    return MyObject.valueProperty.get(this);
-  }
-
-  set value(value: number) {
-    MyObject.valueProperty.set(this, value);
-  }
-
-  private _onValueChanged(oldValue: number, newValue: number): void {
-    // Handle the value change.
-  }
-}
-
-
-var obj = new MyObject();
-obj.value;       // 42
-obj.value = 17;  //
-obj.value;       // 17
-```
-
 When defining a property for use by instances of a **different** class:
 
   - Define the property as a static member of the class.
@@ -180,7 +151,325 @@ belongs to a foreign instance. This pattern is useful when creating container
 objects which must associate container data with child objects in a way which
 doesn't require polluting the child class with extraneous data members.
 
+**Basic Value:**
+
 ```typescript
+import {
+  Property
+} from 'phosphor-properties';
+
+
+class MyObject {
+
+  static valueProperty = new Property<MyObject, number>({
+    name: 'value',
+    value: 42,
+  });
+
+  get value(): number {
+    return MyObject.valueProperty.get(this);
+  }
+
+  set value(value: number) {
+    MyObject.valueProperty.set(this, value);
+  }
+}
+
+
+let obj = new MyObject();
+
+obj.value;       // 42
+obj.value = 17;  //
+obj.value;       // 17
+```
+
+**Create Callback:**
+
+```typescript
+import {
+  Property
+} from 'phosphor-properties';
+
+
+class MyObject {
+
+  static oneProperty = new Property<MyObject, number[]>({
+    name: 'one',
+    value: [1, 2, 3],
+  });
+
+  static twoProperty = new Property<MyObject, number[]>({
+    name: 'two',
+    create: () => [1, 2, 3],
+  });
+
+  get one(): number[] {
+    return MyObject.oneProperty.get(this);
+  }
+
+  get two(): number[] {
+    return MyObject.twoProperty.get(this);
+  }
+}
+
+
+let obj1 = new MyObject();
+let obj2 = new MyObject();
+
+obj1.one;               // [1, 2, 3]
+obj1.two;               // [1, 2, 3]
+
+obj2.one;               // [1, 2, 3]
+obj2.two;               // [1, 2, 3]
+
+obj1.one === obj2.one;  // true
+obj1.two === obj2.two;  // false
+```
+
+**Changed Callback:**
+
+```typescript
+import {
+  Property
+} from 'phosphor-properties';
+
+
+class MyObject {
+
+  static valueProperty = new Property<MyObject, number>({
+    name: 'value',
+    value: 42,
+    changed: (owner, old, value) => { owner._onValueChanged(old, value); },
+  });
+
+  get value(): number {
+    return MyObject.valueProperty.get(this);
+  }
+
+  set value(value: number) {
+    MyObject.valueProperty.set(this, value);
+  }
+
+  private _onValueChanged(old, value): void {
+    console.log(`value changed: ${old}, ${value}`);
+  }
+}
+
+
+let obj = new MyObject();
+
+obj.value;       // 42
+obj.value = 17;  // logs: value changed: 42, 17
+obj.value;       // 17
+```
+
+**Coerce Callback:**
+
+```typescript
+import {
+  Property
+} from 'phosphor-properties';
+
+
+class MyObject {
+
+  static checkableProperty = new Property<MyObject, boolean>({
+    name: 'checkable',
+    value: true,
+    changed: owner => { MyObject.checkedProperty.coerce(owner); },
+  });
+
+  static checkedProperty = new Property<MyObject, boolean>({
+    name: 'checked',
+    value: false,
+    coerce: (owner, value) => owner.checkable ? value : false,
+  });
+
+  get checkable(): boolean {
+    return MyObject.checkableProperty.get(this);
+  }
+
+  set checkable(value: boolean) {
+    MyObject.checkableProperty.set(this, value);
+  }
+
+  get checked(): boolean {
+    return MyObject.checkedProperty.get(this);
+  }
+
+  set checked(value: boolean) {
+    MyObject.checkedProperty.set(this, value);
+  }
+}
+
+
+let obj = new MyObject();
+
+obj.checkable;          // true
+obj.checked;            // false
+
+obj.checked = true;     //
+obj.checked;            // true
+
+obj.checkable = false;  //
+obj.checked;            // false
+```
+
+**Notify Signal:**
+
+```typescript
+import {
+  IChangedArgs, Property
+} from 'phosphor-properties';
+
+import {
+  ISignal, Signal
+} from 'phosphor-signaling';
+
+
+class MyObject {
+
+  static stateChangedSignal = new Signal<MyObject, IChangedArgs<any>>();
+
+  static valueProperty = new Property<MyObject, number>({
+    name: 'value',
+    value: 42,
+    notify: MyObject.stateChangedSignal,
+  });
+
+  static nameProperty = new Property<MyObject, string>({
+    name: 'name',
+    value: 'John',
+    notify: MyObject.stateChangedSignal,
+  });
+
+  get stateChanged(): ISignal<MyObject, IChangedArgs<any>> {
+    return MyObject.stateChangedSignal.bind(this);
+  }
+
+  get value(): number {
+    return MyObject.valueProperty.get(this);
+  }
+
+  set value(value: number) {
+    MyObject.valueProperty.set(this, value);
+  }
+
+  get name(): number {
+    return MyObject.nameProperty.get(this);
+  }
+
+  set name(value: number) {
+    MyObject.nameProperty.set(this, value);
+  }
+}
+
+
+function logger(sender: MyObject, args: IChangedArgs<any>): void {
+  console.log(`name: ${args.name}, old: ${args.oldValue}, new: ${args.newValue}`);
+}
+
+
+let obj = new MyObject();
+
+obj.stateChanged.connect(logger);
+
+obj.value = 17;     // logs: name: 'value', old: 42, new: 17
+obj.name = 'Jane';  // logs: name: 'name', old: 'John', new: 'Jane'
+```
+
+**Compare Callback:**
+
+```typescript
+import {
+  Property
+} from 'phosphor-properties';
+
+
+class MyObject {
+
+  static oneProperty = new Property<MyObject, number>({
+    name: 'one',
+    value: 42,
+    changed: () => { console.log('one changed'); },
+  });
+
+  static twoProperty = new Property<MyObject, number>({
+    name: 'two',
+    value: 19,
+    compare: (a, b) => true,
+    changed: () => { console.log('two changed'); },
+  });
+
+  static threeProperty = new Property<MyObject, number>({
+    name: 'three',
+    value: 100,
+    compare: (a, b) => false,
+    changed: () => { console.log('three changed'); },
+  });
+
+  get one(): number {
+    return MyObject.oneProperty.get(this);
+  }
+
+  set one(value: number) {
+    MyObject.oneProperty.set(this, value);
+  }
+
+  get two(): number {
+    return MyObject.twoProperty.get(this);
+  }
+
+  set two(value: number) {
+    MyObject.twoProperty.set(this, value);
+  }
+
+  get three(): number {
+    return MyObject.threeProperty.get(this);
+  }
+
+  set three(value: number) {
+    MyObject.threeProperty.set(this, value);
+  }
+}
+
+
+let obj = new MyObject();
+
+obj.one;        // 42
+obj.two;        // 19
+obj.three;      // 100
+
+obj.one = 0;    // logs: one changed
+obj.one;        // 0
+obj.one = 1;    // logs: one changed
+obj.one;        // 1
+obj.one = 1;    // no log
+obj.one;        // 1
+
+obj.two = 0;    // no log
+obj.two;        // 0
+obj.two = 1;    // no log
+obj.two;        // 1
+obj.two = 1;    // no log
+obj.two;        // 1
+
+obj.three = 0;  // logs: three changed
+obj.three;      // 0
+obj.three = 1;  // logs: three changed
+obj.three;      // 1
+obj.three = 1;  // logs: three changed
+obj.three;      // 1
+```
+
+**Attached Property:**
+
+```typescript
+import {
+  Property
+} from 'phosphor-properties';
+
+
 class MyWidget {
   // ...
 }
@@ -189,6 +478,7 @@ class MyWidget {
 class MyContainer {
 
   static stretchProperty = new Property<MyWidget, number>({
+    name: 'stretch',
     value: 0,
     coerce: (owner, value) => Math.max(0, value),
   });
@@ -208,9 +498,9 @@ class MyContainer {
 }
 
 
-var widget = new MyWidget();
+let widget = new MyWidget();
 MyContainer.setStretch(widget, 3);
 
-var container = new MyContainer();
+let container = new MyContainer();
 container.addWidget(widget);
 ```
