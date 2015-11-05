@@ -8,39 +8,30 @@
 'use strict';
 
 import {
-  ISignal, Signal
+  Signal
 } from 'phosphor-signaling';
 
 
 /**
- * The arguments object emitted with a changed signal.
+ * The args object emitted with a change notification signal.
  */
 export
-interface IPropertyChangedArgs<T, U> {
+interface IChangedArgs<T> {
   /**
-   * The property descriptor associated with the change.
+   * The name of the property which was changed.
    */
-  property: Property<T, U>;
+  name: string;
 
   /**
    * The old value of the property.
    */
-  oldValue: U;
+  oldValue: T;
 
   /**
    * The new value of the property.
    */
-  newValue: U;
+  newValue: T;
 }
-
-
-/**
- * This type alias is deprecated.
- *
- * New code should use the [[IPropertyChangedArgs]] interface.
- */
-export
-type IChangedArgs = IPropertyChangedArgs<any, any>;
 
 
 /**
@@ -49,32 +40,48 @@ type IChangedArgs = IPropertyChangedArgs<any, any>;
 export
 interface IPropertyOptions<T, U> {
   /**
+   * The human readable name for the property.
+   *
+   * #### Notes
+   * By convention, this should be the same as the name used to define
+   * the public accessor for the property value.
+   *
+   * This **does not** have an effect on the property lookup behavior.
+   * Multiple properties may share the same name without conflict.
+   */
+  name: string;
+
+  /**
    * The default value for the property.
    *
    * #### Notes
    * This value will be shared among all property owner instances. It
    * should be an immutable value unless a mutable shared singleton
    * is explicitly desired.
+   *
+   * If this is not provided, it defaults to `undefined`.
    */
   value?: U;
 
   /**
    * A factory function used to create the default property value.
    *
+   * #### Notes
    * If provided, this takes precedence over the [[value]] option.
-   * It will be called whenever the property value is required,
-   * but has not yet been set.
+   *
+   * This will be called whenever the property value is required,
+   * but has not yet been set for a given owner.
    */
   create?: (owner: T) => U;
 
   /**
    * A function used to coerce a supplied value into the final value.
    *
+   * #### Notes
    * This will be called whenever the property value is changed, or
    * when the property is explicitly coerced. The return value will
    * be used as the final value of the property.
    *
-   * #### Notes
    * This will **not** be called for the initial default value.
    */
   coerce?: (owner: T, value: U) => U;
@@ -82,175 +89,90 @@ interface IPropertyOptions<T, U> {
   /**
    * A function used to compare two values for equality.
    *
+   * #### Notes
    * This is called to determine if the property value has changed.
    * It should return `true` if the given values are equivalent, or
    * `false` if they are different.
    *
-   * #### Notes
-   * If this is not provided, the comparison uses the `===` operator.
+   * If this is not provided, it defaults to the `===` operator.
    */
   compare?: (oldValue: U, newValue: U) => boolean;
 
   /**
    * A function called when the property value has changed.
    *
+   * #### Notes
    * This will be invoked when the property value is changed and the
-   * comparitor indicates that the old value is not equal to the new
+   * comparator indicates that the old value is not equal to the new
    * value.
    *
-   * #### Notes
    * This will **not** be called for the initial default value.
    *
-   * This will be invoked **before** the changed signals are emitted
-   * on the property owner.
+   * This will be invoked **before** the notify signal is emitted.
    */
   changed?: (owner: T, oldValue: U, newValue: U) => void;
 
   /**
-   * Whether to emit the changed signals when the property changes.
-   *
-   * If this is `true`, the changed signals **will not** be emitted
-   * when the property value changes. This allows for the creation of
-   * private properties which cannot be observed by external code. It
-   * also provides an optimization point for properties which don't
-   * need to be observed.
-   *
-   * The default value is `false`.
-   */
-  silent?: boolean;
-
-  /**
-   * Optional user-defined metadata for the property.
+   * A signal emitted when the property value has changed.
    *
    * #### Notes
-   * The property does not use the metadata for its own purposes. It
-   * exists as convenient storage for supporting external use cases.
+   * This will be bound and emitted on behalf of the owner when the
+   * property is changed and the comparator indicates that the old
+   * value is not equal to the new value.
    *
-   * By convention, metadata should be defined as an object literal.
+   * This will **not** be emitted for the initial default value.
    *
-   * If not provided, an empty metadata object will be created.
+   * This will be emitted **after** the changed callback is invoked.
    */
-  metadata?: any;
+  notify?: Signal<T, IChangedArgs<U>>;
 }
 
 
 /**
- * A property descriptor for a property on an object.
+ * A property descriptor for a datum belonging to an object.
  *
- * Properties descriptors can be used to expose a rich interface for an
+ * Property descriptors can be used to expose a rich interface for an
  * object which encapsulates value creation, coercion, and notification.
  * They can also be used to extend the state of an object with semantic
- * data from another class.
- *
- * #### Example
- * ```typescript
- * import { Property } from 'phosphor-properties';
- *
- * class MyClass {
- *
- *   static myValueProperty = new Property<MyClass, number>({
- *      value: 0,
- *      coerce: (owner, value) => Math.max(0, value),
- *      changed: (owner, oldValue, newValue) => { console.log(newValue); },
- *   });
- *
- *   get myValue(): number {
- *     return MyClass.myValueProperty.get(this);
- *   }
- *
- *   set myValue(value: number) {
- *     MyClass.myValueProperty.set(this, value);
- *   }
- * }
- * ```
+ * data from an unrelated class.
  */
 export
 class Property<T, U> {
-  /**
-   * A signal emitted when a property value changes.
-   *
-   * #### Notes
-   * This is an attached signal which will be emitted using the owner
-   * of the property value as the sender.
-   *
-   * **See Also:** [[getChanged]]
-   */
-  static changedSignal = new Signal<any, IPropertyChangedArgs<any, any>>();
-
-  /**
-   * Get the bound changed signal for a given property owner.
-   *
-   * @param owner - The object to bind to the changed signal.
-   *
-   * @returns The bound changed signal for the owner.
-   *
-   * #### Notes
-   * This signal will be emitted whenever **any** property value for
-   * the specified owner is changed.
-   *
-   * This signal is emitted **after** the instance changed signal.
-   *
-   * This signal will not be emmited for properties marked as silent.
-   */
-  static getChanged<V>(owner: V): ISignal<V, IPropertyChangedArgs<V, any>> {
-    return Property.changedSignal.bind(owner);
-  }
-
   /**
    * Construct a new property descriptor.
    *
    * @param options - The options for initializing the property.
    */
-  constructor(options: IPropertyOptions<T, U> = {}) {
+  constructor(options: IPropertyOptions<T, U>) {
+    this._name = options.name;
     this._value = options.value;
     this._create = options.create;
     this._coerce = options.coerce;
     this._compare = options.compare;
     this._changed = options.changed;
-    this._silent = !!options.silent;
-    this._metadata = options.metadata || {};
+    this._notify = options.notify;
   }
 
   /**
-   * Get the metadata for the property.
+   * Get the human readable name for the property.
    *
    * #### Notes
    * This is a read-only property.
    */
-  get metadata(): any {
-    return this._metadata;
+  get name(): string {
+    return this._name;
   }
 
   /**
-   * A signal emitted when the property value changes.
+   * Get the notify signal for the property.
    *
    * #### Notes
-   * This is an attached signal which will be emitted using the owner
-   * of the property value as the sender.
+   * This will be `undefined` if no notify signal was provided.
    *
-   * **See Also:** [[getChanged]]
+   * This is a read-only property.
    */
-  get changedSignal(): Signal<T, IPropertyChangedArgs<T, U>> {
-    return this._changedSignal;
-  }
-
-  /**
-   * Get the bound changed signal for a given property owner.
-   *
-   * @param owner - The object to bind to the changed signal.
-   *
-   * @returns The bound changed signal for the owner.
-   *
-   * #### Notes
-   * This signal will be emitted whenever **this** property value
-   * for the specified owner is changed.
-   *
-   * This signal is emitted **before** the static changed signal.
-   *
-   * This signal will not be emmited for properties marked as silent.
-   */
-  getChanged(owner: T): ISignal<T, IPropertyChangedArgs<T, U>> {
-    return this._changedSignal.bind(owner);
+  get notify(): Signal<T, IChangedArgs<U>> {
+    return this._notify;
   }
 
   /**
@@ -283,9 +205,6 @@ class Property<T, U> {
    * @param value - The value for the property.
    *
    * #### Notes
-   * If this operation causes the property value to change, the
-   * changed signals will be emitted with the owner as sender.
-   *
    * If the value has not yet been set, the default value will be
    * computed and used as the previous value for the comparison.
    */
@@ -307,9 +226,6 @@ class Property<T, U> {
    * @param owner - The property owner of interest.
    *
    * #### Notes
-   * If this operation causes the property value to change, the
-   * changed signals will be emitted with the owner as sender.
-   *
    * If the value has not yet been set, the default value will be
    * computed and used as the previous value for the comparison.
    */
@@ -353,30 +269,30 @@ class Property<T, U> {
    * Run the change notification if the given values are different.
    */
   private _maybeNotify(owner: T, oldValue: U, newValue: U): void {
+    let changed = this._changed;
+    let notify = this._notify;
+    if (!changed && !notify) {
+      return;
+    }
     if (this._compareValue(oldValue, newValue)) {
       return;
     }
-    let changed = this._changed;
     if (changed) {
       changed(owner, oldValue, newValue);
     }
-    if (this._silent) {
-      return;
+    if (notify) {
+      notify.bind(owner).emit({ name: this._name, oldValue, newValue });
     }
-    let args = { property: this, oldValue, newValue };
-    this.getChanged(owner).emit(args);
-    Property.getChanged(owner).emit(args);
   }
 
   private _value: U;
-  private _metadata: any;
-  private _silent: boolean;
+  private _name: string;
   private _pid = nextPID();
   private _create: (owner: T) => U;
   private _coerce: (owner: T, value: U) => U;
+  private _notify: Signal<T, IChangedArgs<U>>;
   private _compare: (oldValue: U, newValue: U) => boolean;
   private _changed: (owner: T, oldValue: U, newValue: U) => void;
-  private _changedSignal = new Signal<T, IPropertyChangedArgs<T, U>>();
 }
 
 
@@ -387,7 +303,7 @@ class Property<T, U> {
  *
  * #### Notes
  * This will clear all property values for the owner, but it will
- * **not** emit any change notifications.
+ * **not** run the change notification for any of the properties.
  */
 export
 function clearPropertyData(owner: any): void {
