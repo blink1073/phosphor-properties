@@ -13,7 +13,7 @@ import {
 
 
 /**
- * The args object emitted with the change notification signal.
+ * The args object emitted with a change notification signal.
  */
 export
 interface IChangedArgs<T> {
@@ -46,8 +46,8 @@ interface IPropertyOptions<T, U> {
    * By convention, this should be the same as the name used to define
    * the public accessor for the property value.
    *
-   * This **does not** have an effect on the property lookup behavior,
-   * and multiple properties may share the same name without conflict.
+   * This **does not** have an effect on the property lookup behavior.
+   * Multiple properties may share the same name without conflict.
    */
   name: string;
 
@@ -94,7 +94,7 @@ interface IPropertyOptions<T, U> {
    * It should return `true` if the given values are equivalent, or
    * `false` if they are different.
    *
-   * If this is not provided, the comparison uses the `===` operator.
+   * If this is not provided, it defaults to the `===` operator.
    */
   compare?: (oldValue: U, newValue: U) => boolean;
 
@@ -129,61 +129,12 @@ interface IPropertyOptions<T, U> {
 
 
 /**
- * A property descriptor for a property on an object.
+ * A property descriptor for a datum belonging to an object.
  *
- * Properties descriptors can be used to expose a rich interface for an
+ * Property descriptors can be used to expose a rich interface for an
  * object which encapsulates value creation, coercion, and notification.
- *
  * They can also be used to extend the state of an object with semantic
- * data from another class.
- *
- * #### Example
- * ```typescript
- * import { IChangedArgs, Property } from 'phosphor-properties';
- *
- * import { ISignal, Signal } from 'phosphor-signaling';
- *
- * class MyClass {
- *
- *   static stateChangedSignal = new Signal<MyClass, IChangedArgs<any>>();
- *
- *   static valueProperty = new Property<MyClass, number>({
- *      name: 'value',
- *      value: 0,
- *      coerce: (owner, value) => Math.max(0, value),
- *      changed: (owner, oldValue, newValue) => { console.log(newValue); },
- *      notify: MyClass.stateChangedSignal,
- *   });
- *
- *   static textProperty = new Property<MyClass, number>({
- *      name: 'text',
- *      value: '',
- *      coerce: (owner, value) => value.toLowerCase(),
- *      changed: (owner, oldValue, newValue) => { console.log(newValue); },
- *      notify: MyClass.stateChangedSignal,
- *   });
- *
- *   get stateChanged(): ISignal<MyClass, IChangedArgs<any>> {
- *     return MyClass.stateChangedSignal.bind(this);
- *   }
- *
- *   get value(): number {
- *     return MyClass.valueProperty.get(this);
- *   }
- *
- *   set value(value: number) {
- *     MyClass.valueProperty.set(this, value);
- *   }
- *
- *   get text(): string {
- *     return MyClass.textProperty.get(this);
- *   }
- *
- *   set text(value: string) {
- *     MyClass.textProperty.set(this, value);
- *   }
- * }
- * ```
+ * data from an unrelated class.
  */
 export
 class Property<T, U> {
