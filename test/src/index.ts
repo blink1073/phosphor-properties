@@ -23,6 +23,14 @@ class Model {
 }
 
 
+function expectArrayEqual(arr1: any[], arr2: any[]): void {
+  expect(arr1.length).to.be(arr2.length);
+  for (let i = 0; i < arr1.length; i++) {
+    expect(arr1[i]).to.be(arr2[i]);
+  }
+}
+
+
 describe('phosphor-properties', () => {
 
   describe('Property', () => {
@@ -313,7 +321,7 @@ describe('phosphor-properties', () => {
         p3.set(m1, 7);
         p3.set(m2, 8);
         p3.set(m3, 9);
-        expect(models).to.eql([m1, m2, m3, m1, m2, m3, m1, m2, m3]);
+        expectArrayEqual(models, [m1, m2, m3, m1, m2, m3, m1, m2, m3]);
         expect(oldvals).to.eql([0, 0, 0, 0, 0, 0, 0, 0, 0]);
         expect(newvals).to.eql([1, 2, 3, 4, 5, 6, 7, 8, 9]);
       });
@@ -348,7 +356,7 @@ describe('phosphor-properties', () => {
         p3.set(m1, 7);
         p3.set(m2, 8);
         p3.set(m3, 9);
-        expect(models).to.eql([m1, m2, m3, m1, m2, m3, m1, m2, m3]);
+        expectArrayEqual(models, [m1, m2, m3, m1, m2, m3, m1, m2, m3]);
         expect(names).to.eql(['p1', 'p1', 'p1', 'p2', 'p2', 'p2', 'p3', 'p3', 'p3']);
         expect(oldvals).to.eql([0, 0, 0, 1, 1, 1, 2, 2, 2]);
         expect(newvals).to.eql([1, 2, 3, 4, 5, 6, 7, 8, 9]);
@@ -392,7 +400,7 @@ describe('phosphor-properties', () => {
         p3.set(m1, 7);
         p3.set(m2, 8);
         p3.set(m3, 9);
-        expect(models).to.eql([m1, m2, m3, m1, m2, m3, m1, m2, m3]);
+        expectArrayEqual(models, [m1, m2, m3, m1, m2, m3, m1, m2, m3]);
         expect(oldvals).to.eql([42, 43, 44, 45, 46, 47, 48, 49, 50]);
         expect(newvals).to.eql([1, 2, 3, 4, 5, 6, 7, 8, 9]);
       });
@@ -423,7 +431,7 @@ describe('phosphor-properties', () => {
         p3.set(m1, 7);
         p3.set(m2, 8);
         p3.set(m3, 9);
-        expect(models).to.eql([m1, m2, m3, m1, m2, m3, m1, m2, m3]);
+        expectArrayEqual(models, [m1, m2, m3, m1, m2, m3, m1, m2, m3]);
         expect(oldvals).to.eql([42, 43, 44, 45, 46, 47, 48, 49, 50]);
         expect(newvals).to.eql([1, 2, 3, 4, 5, 6, 7, 8, 9]);
       });
